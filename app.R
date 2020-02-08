@@ -11,10 +11,10 @@ require(ggplot2)
 library(shinyWidgets)
 
 options(max.print=1000000)
-fig.width <- 1200
+fig.width <- 1375
 fig.height <- 550
 
-fig.width2 <- 1200
+fig.width2 <- 1375 #1200
 fig.height2 <- 750
 library(shinythemes)        # more funky looking apps
 p1 <- function(x) {formatC(x, format="f", digits=1)}
@@ -60,7 +60,7 @@ ui <- fluidPage(theme = shinytheme("paper"), #https://www.rdocumentation.org/pac
                      
                      
                      
-                    sidebarPanel( 
+                    sidebarPanel( width=3 ,
                       
                     
                      tags$style(type="text/css", ".span8 .well { background-color: #00FFFF; }"),
@@ -159,7 +159,7 @@ ui <- fluidPage(theme = shinytheme("paper"), #https://www.rdocumentation.org/pac
                     ),
                     
                     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~tab panels
-                    mainPanel(
+                    mainPanel(width=9,
                    
                
                         #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
