@@ -31,16 +31,7 @@ is.even <- function(x){ x %% 2 == 0 }
 ui <- fluidPage(theme = shinytheme("paper"), #https://www.rdocumentation.org/packages/shinythemes/versions/1.1.2
                 
        
-        #         tags$head(tags$style(
-        #           HTML('
-        #  #sidebar {
-        #     background-color: #dec4de;
-        # }
-        # 
-        # body, label, input, button, select { 
-        #   font-family: "Arial";
-        # }')
-                # )),
+    
 
                        setBackgroundColor(
                   color = c("#F7FBFF", "#2171B5"),
@@ -71,8 +62,8 @@ ui <- fluidPage(theme = shinytheme("paper"), #https://www.rdocumentation.org/pac
                      
                     sidebarPanel( 
                       
-                      #tags$style(".well {background-color:[ #2171B5];}"),
-                     # tags$style(type="text/css", ".span8 .well { background-color: #00FFFF; }"),
+                    
+                     tags$style(type="text/css", ".span8 .well { background-color: #00FFFF; }"),
                       
                       #wellPanel(style = "background: #2171B5",),
                       
@@ -90,12 +81,25 @@ ui <- fluidPage(theme = shinytheme("paper"), #https://www.rdocumentation.org/pac
                         
                         div(
                             
+                          tags$head(
+                            tags$style(HTML('#ab1{background-color:orange}'))
+                          ),
+                          
+                          tags$head(
+                            tags$style(HTML('#resample{background-color:green}'))
+                          ),
+                          
+                          
                             actionButton(inputId='ab1', label="R code",   icon = icon("th"), 
                                          onclick ="window.open('https://raw.githubusercontent.com/eamonn2014/biochemistry-and-haematology/master/heam_biochem/app.R', '_blank')"),   
                             actionButton("resample", "Simulate a new sample"),
                             br(), br(),
                             
                             div(strong("Select the parameters using the sliders below"),p(" ")),
+                            
+                            
+                    
+                            
                             
                             div(("  
                            xxxxxxxxxxxxxx  ")),
