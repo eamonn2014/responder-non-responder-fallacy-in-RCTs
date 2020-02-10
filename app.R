@@ -505,20 +505,21 @@ server <- shinyServer(function(input, output   ) {
     
         
         par(mfrow=c(1,2))
-        with(trt, plot(diff ~  y.0observed,
+        with(trt, plot(diff ~  y.0observed, 
 
                   col=  ifelse(beta.treatment <  0, trt$col1 , 
                                    ifelse(beta.treatment >  0, trt$col2 ,    NA )) ,
                        pch=16
                        , xlab="observed baseline",  ylab="follow up - baseline"  ,
-         main=paste0("Treatment arm: Individual changes against baseline, observed responders in blue\nPearson's correlation ",cr)), cex.main =1,
-                       ylim=c(mi,ma), xlim=c(mix,max) )
+         main=paste0("Treatment arm: Individual changes against baseline, observed responders in blue\nPearson's correlation ",cr), cex.main =1.25,
+                       ylim=c(mi,ma), xlim=c(mix,max) ))
      
         
         with(trt, abline(lm(diff ~  y.0observed)))
         with(trt, abline(h=mean(beta.treatment), lty=2))
         with(trt, abline(h=0, col="red", lty="dashed"))
-        
+        # with(trt, abline(h=max, col="white", lty="dashed"))
+        # with(trt, abline(h=mix, col="white", lty="dashed"))
         #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         
         ctr <- trial[trial$treat==0,]
@@ -537,14 +538,15 @@ server <- shinyServer(function(input, output   ) {
                                     ifelse(beta.treatment >  0, ctr$col2 ,    NA )) ,
                       pch=16
                , xlab="observed baseline",  ylab="follow up - baseline"  ,
-              main=paste0("Control arm:  Individual changes against baseline, observed responders in blue\nPearson's correlation ",cr)), cex.main =1,
-             ylim=c(mi,ma), xlim=c(mix,max) ) 
+              main=paste0("Control arm:  Individual changes against baseline, observed responders in blue\nPearson's correlation ",cr), cex.main =1.25,
+             ylim=c(mi,ma), xlim=c(mix,max) ) ) 
     
         with(ctr, abline(lm(diff ~  y.0observed)))
         with(ctr, abline(h=mean(beta.treatment), lty=2))
         with(ctr, abline(h=0, col="red", lty="dashed"))
         
-         
+        # with(ctr, abline(h=max, col="white", lty="dashed"))
+        # with(ctr, abline(h=mix, col="white", lty="dashed"))
         par(mfrow=c(1,1))
 
     })
@@ -587,7 +589,7 @@ server <- shinyServer(function(input, output   ) {
            Suggested individual differences due entirely to regression to the mean
            and random error (within subject and measurement error)"
       
-      plot(foo$foo, main=tex,
+      plot(foo$foo, main=tex, 
            ylab= "follow up - baseline", xlab="Individual subjects order by observed response", 
            xlim=c(0, xup), ylim=c(mi,ma), #length(trt[,"diff"])
            col=  foo$colz)
