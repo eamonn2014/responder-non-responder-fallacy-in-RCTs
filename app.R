@@ -15,7 +15,7 @@ fig.width <- 1375
 fig.height <- 550
 
 fig.width2 <- 1375 #1200
-fig.height2 <- 750
+fig.height2 <- 730
 library(shinythemes)        # more funky looking apps
 p1 <- function(x) {formatC(x, format="f", digits=1)}
 p2 <- function(x) {formatC(x, format="f", digits=2)}
@@ -26,7 +26,9 @@ pop=1e6
 # function to create longitudinal data  
 
 is.even <- function(x){ x %% 2 == 0 }
-#tags$style(".span12 {background-color: red;}")
+
+# Individual response to treatment: is it a valid assumption senn
+# 1- pnorm((250-200)/sqrt(100^2+100^2))
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ui <- fluidPage(theme = shinytheme("paper"), #https://www.rdocumentation.org/packages/shinythemes/versions/1.1.2
                 
@@ -34,7 +36,7 @@ ui <- fluidPage(theme = shinytheme("paper"), #https://www.rdocumentation.org/pac
     
 
                        setBackgroundColor(
-                  color = c("#F7FBFF", "#2171B5"),
+                  color = c( "#2171B5", "#F7FBFF"),
                   gradient = "linear",
                   direction = "bottom"
                 ),
@@ -68,7 +70,7 @@ ui <- fluidPage(theme = shinytheme("paper"), #https://www.rdocumentation.org/pac
                       #wellPanel(style = "background: #2171B5",),
                       
                       
-                        tags$style(".well {background-color:#dec4de;}"),
+                        tags$style(".well {background-color:#b6aebd ;}"), ##ABB0B4AF
                        
                       
       
@@ -86,7 +88,7 @@ ui <- fluidPage(theme = shinytheme("paper"), #https://www.rdocumentation.org/pac
                           ),
                           
                           tags$head(
-                            tags$style(HTML('#resample{background-color:green}'))
+                            tags$style(HTML('#resample{background-color:orange}'))
                           ),
                           
                           
@@ -133,13 +135,15 @@ ui <- fluidPage(theme = shinytheme("paper"), #https://www.rdocumentation.org/pac
                             
                             
                             sliderInput("eligible",
-                                        strong("eligible"),
-                                        min=-50, max=50, step=1, value=-20, ticks=FALSE),
+                                        strong("eligible if multiple SD from population mean "),
+                                        min=-3, max=3, step=1, value=0, ticks=FALSE),
                    
                             
                             div(p( strong("References:"))),  
                             
-
+                    
+                     
+                          
                             tags$a(href = "https://en.wikipedia.org/wiki/Anscombe%27s_quartet", "[1] Anscombe's quartet"),
                             div(p(" ")),
                             tags$a(href = "https://en.wikipedia.org/wiki/Comprehensive_metabolic_panel", "[2] Comprehensive metabolic panel"),
@@ -172,7 +176,7 @@ ui <- fluidPage(theme = shinytheme("paper"), #https://www.rdocumentation.org/pac
                             
                             
                             tags$style(HTML("
-                            .navbar-default .navbar-brand {color: cyan;}
+                            .navbar-default .navbar-brand {color: orange;}
                             .navbar-default .navbar-brand:hover {color: blue;}
                             .navbar { background-color: #b6aebd;}
                             .navbar-default .navbar-nav > li > a {color:black;}
@@ -189,6 +193,7 @@ ui <- fluidPage(theme = shinytheme("paper"), #https://www.rdocumentation.org/pac
                             tabPanel("Plotting the data", 
                                      #    h2("Plotting the data"),
                                      div(plotOutput("reg.plot3", width=fig.width, height=fig.height)),  
+                                     h5("Figure 1 Indivduals ordered by increasing observed response in treated (left) and control (right) arms."),
                                      
                                      h3(" "),
                                      
@@ -204,23 +209,26 @@ ui <- fluidPage(theme = shinytheme("paper"), #https://www.rdocumentation.org/pac
                                      
                                    div( verbatimTextOutput("xx")),
                                      p(strong("Total sample size:")),
-
-                                   verbatimTextOutput("summaryx3")
+                                        
                             ) ,
                             #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                             tabPanel("xxxxxxxxxxx",
                                      h4("Fxxxxxxxxxxxxxxxxxxxxxxxxxxxx"),
-                                     div(plotOutput("res.plot", width=fig.width, height=fig.height)),       
+                                     div(plotOutput("res.plot", width=fig.width, height=fig.height)),  
+                                     h5("Figure 2 Observed response by baseline in treated (left) and control (right) arms. "),         
+                                     
+                                     
                                      p(strong("xxxxxxxxxxxxxxxxxxxxxxxxxxxx
                                               ")),
                             ),
                             
                             #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                             tabPanel("Summary statistics", value=3, 
-                                      h4("xxxxxxxxxxxxxxxxxx"),#
-                                     h6("xxxxxxxxxxxxxxxxxx."),
+                                    #  h4("xxxxxxxxxxxxxxxxxx"),#
+                                     #h6("xxxxxxxxxxxxxxxxxx."),
                                      div(plotOutput("res.plot4", width=fig.width2, height=fig.height2)), 
-                                                 
+                                    h5("Figure 3 All plots together. Top indivduals ordered by increasing observed response in treated (left) and control (right) arms. 
+                                        Bottom planels show observed response by baseline in treated (left) and control (right) arms. "),         
                             ) ,
                             #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                             tabPanel("Statistical modelling", value=6, 
@@ -279,16 +287,16 @@ server <- shinyServer(function(input, output   ) {
     # ---------------------------------------------------------------------------
     # --------------------------------------------------------------------------
     # ---------------------------------------------------------------------------
-    n <- 10000
-    power <- .9
-    alpha <- .05
-    beta.treatment <-     -2
-    pop_mu <-     7
-    pop_sd <-     5
-
-    noise <-  0
-    ur.eligible <- 0
+    # n <- 10000
+    # power <- .9
+    # alpha <- .05
+    # beta.treatment <-     -2
+    # pop_mu <-     7
+    # pop_sd <-     5
     # 
+    # noise <-  3
+    # ur.eligible <- 0
+
     # 
     # --------------------------------------------------------------------------
     # ---------------------------------------------------------------------------
@@ -377,7 +385,7 @@ server <- shinyServer(function(input, output   ) {
     output$reg.plot3 <- renderPlot({         
         
         trial <- make.data()$trial
-        
+        sample <- random.sample()
         N <- make.data()$N
         
         diff <- trial$y.1observed - trial$y.0observed
@@ -392,12 +400,40 @@ server <- shinyServer(function(input, output   ) {
   
         foo <- sort(trt[,"diff"])
         
-        plot(foo, main="Individual changes in response in treated arm
+        foo <- data.frame(foo, col1=NA, col2=NA)
+        
+        foo$col1 =   ifelse(foo$foo <    trt$beta.treatment, "blue" , "black")         
+        foo$col2 =   ifelse(foo$foo >    trt$beta.treatment, "blue" , "black")   
+        
+        if (trt$beta.treatment <  0) {foo$colz = foo$col1} else {foo$colz = foo$col2}
+      
+        tex <- "Individual changes in response in treated arm
            Suggested individual differences due entirely to regression to the mean
-           and random error (within subject and measurement error)",
+           and random error (within subject and measurement error)"
+        
+        plot(foo$foo, main=tex,
              ylab= "follow up - baseline", xlab="Individual subjects order by observed response", 
              xlim=c(0,1.05*N/2), ylim=c(mi,ma), #length(trt[,"diff"])
-               col=ifelse(foo > input$trt, 'red', 'blue') ) #, asp=4)
+             col=  foo$colz)
+        
+        
+        
+      
+          # 
+          # 
+          # 
+          # plot(foo, main=tex,
+          #      ylab= "follow up - baseline", xlab="Individual subjects order by observed response", 
+          #      xlim=c(0,1.05*N/2), ylim=c(mi,ma), #length(trt[,"diff"])
+          #      col=  ifelse(beta.treatment <  0, col1 , 
+          #                   ifelse(beta.treatment >  0, col2 ,    NA ) ))
+          #  
+         
+         
+     
+        
+        
+        
         abline(h=0, lty=2)
         abline(h=input$trt)
         # this many were not observed to have reduced response by more than 5
@@ -410,15 +446,26 @@ server <- shinyServer(function(input, output   ) {
         trt$diff <- trt$y.1observed - trt$y.0observed
  
         foo <- sort(trt[,"diff"])
-        plot(foo, main="Individual changes in response in control arm
+        # plot(foo, main="",
+        #      ylab= "follow up - baseline", xlab="Individual subjects order by observed treatment response",
+        #      xlim=c(0,1.05*N/2),ylim=c(mi,ma), #length(trt[,"diff"])
+        #      col=ifelse(foo > input$trt, 'red', 'blue') )#, asp=4)
+        tex <-"Individual changes in response in control arm
            Suggested individual differences due entirely to regression to the mean
-           and random error (within subject and measurement error)",
-             ylab= "follow up - baseline", xlab="Individual subjects order by observed treatment response",
-             xlim=c(0,1.05*N/2),ylim=c(mi,ma), #length(trt[,"diff"])
-             col=ifelse(foo > input$trt, 'red', 'blue') )#, asp=4)
+           and random error (within subject and measurement error)" 
+        
+        col1 =   ifelse(foo <  beta.treatment, "blue" , "black")         
+        col2 =   ifelse(foo >  beta.treatment, "blue" , "black")   
+        
+        plot(foo, main=tex, 
+               ylab= "follow up - baseline", xlab="Individual subjects order by observed response", 
+               xlim=c(0,1.05*N/2), ylim=c(mi,ma), #length(trt[,"diff"])
+               col=  ifelse(beta.treatment <  0, col1 , 
+                            ifelse(beta.treatment >  0, col2 ,    NA ) ))
+       
         abline(h=0, lty=2)
         abline(h=input$trt)
-        # this many were not observed to have reduced response by more than 5
+        # this many were not observed to have red uced response by more than 5
         # wrongly labelled as 'non responders'
          mean(foo > input$trt)*length(foo)   # shown in red
         
@@ -447,12 +494,28 @@ server <- shinyServer(function(input, output   ) {
         trt <- trial[trial$treat==1,]
         trt$diff <- trt$y.1observed - trt$y.0observed
         
+ 
+        trt$col1 =   ifelse(trt$diff <  (sample$trt), "blue" , "black")         
+        trt$col2 =   ifelse(trt$diff >  (sample$trt), "blue" , "black")           
+    
         
         par(mfrow=c(1,2))
-        with(trt, plot(diff ~  y.0observed, col=ifelse(diff < sample$trt, 'blue', 'black'), pch=16
+        with(trt, plot(diff ~  y.0observed,
+
+                  col=  ifelse(beta.treatment <  0, trt$col1 , 
+                                   ifelse(beta.treatment >  0, trt$col2 ,    NA )) ,
+                     
+
+                       pch=16
                        , xlab="observed baseline",  ylab="follow up - baseline"  ,
                        main="Treatment arm: Individual changes against baseline, observed responders in blue", cex.main =1,
                        ylim=c(mi,ma), xlim=c(mix,max) ))
+     
+        
+        
+        
+        
+        
         with(trt, abline(lm(diff ~  y.0observed)))
         with(trt, abline(h=mean(beta.treatment), lty=2))
         with(trt, abline(h=0, col="red", lty="dashed"))
@@ -464,9 +527,17 @@ server <- shinyServer(function(input, output   ) {
         
         with(trt, cor.test( diff,   y.0observed, method="pearson"))
         
+        ctr$col1 =   ifelse(ctr$diff <  (sample$trt), "blue" , "black")         
+        ctr$col2 =   ifelse(ctr$diff >  (sample$trt), "blue" , "black")   
         
-        
-        with(ctr, plot(diff ~  y.0observed, col=ifelse(diff <  sample$trt, 'blue', 'black'), pch=16
+        with(ctr, plot(diff ~  y.0observed, 
+                       
+                      # col=ifelse(diff <  sample$trt, 'blue', 'black'), 
+                       col=  ifelse(beta.treatment <  0, ctr$col1 , 
+                                    ifelse(beta.treatment >  0, ctr$col2 ,    NA )) ,
+                       
+                       
+                       pch=16
                        , xlab="observed baseline",  ylab="follow up - baseline"  ,
                        main="Control arm:  Individual changes against baseline, observed responders in blue", cex.main =1,
                        ylim=c(mi,ma), xlim=c(mix,max) ))
