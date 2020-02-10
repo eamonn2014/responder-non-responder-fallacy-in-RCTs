@@ -444,24 +444,23 @@ server <- shinyServer(function(input, output   ) {
         
         trt <- trial[trial$treat==0,]
         trt$diff <- trt$y.1observed - trt$y.0observed
- 
         foo <- sort(trt[,"diff"])
-        # plot(foo, main="",
-        #      ylab= "follow up - baseline", xlab="Individual subjects order by observed treatment response",
-        #      xlim=c(0,1.05*N/2),ylim=c(mi,ma), #length(trt[,"diff"])
-        #      col=ifelse(foo > input$trt, 'red', 'blue') )#, asp=4)
-        tex <-"Individual changes in response in control arm
+        
+        foo <- data.frame(foo, col1=NA, col2=NA)
+        
+        foo$col1 =   ifelse(foo$foo <    trt$beta.treatment, "blue" , "black")         
+        foo$col2 =   ifelse(foo$foo >    trt$beta.treatment, "blue" , "black")   
+        
+        if (trt$beta.treatment <  0) {foo$colz = foo$col1} else {foo$colz = foo$col2}
+        
+        tex <- "Individual changes in response in treated arm
            Suggested individual differences due entirely to regression to the mean
-           and random error (within subject and measurement error)" 
+           and random error (within subject and measurement error)"
         
-        col1 =   ifelse(foo <  beta.treatment, "blue" , "black")         
-        col2 =   ifelse(foo >  beta.treatment, "blue" , "black")   
-        
-        plot(foo, main=tex, 
-               ylab= "follow up - baseline", xlab="Individual subjects order by observed response", 
-               xlim=c(0,1.05*N/2), ylim=c(mi,ma), #length(trt[,"diff"])
-               col=  ifelse(beta.treatment <  0, col1 , 
-                            ifelse(beta.treatment >  0, col2 ,    NA ) ))
+        plot(foo$foo, main=tex,
+             ylab= "follow up - baseline", xlab="Individual subjects order by observed response", 
+             xlim=c(0,1.05*N/2), ylim=c(mi,ma), #length(trt[,"diff"])
+             col=  foo$colz)
        
         abline(h=0, lty=2)
         abline(h=input$trt)
@@ -576,10 +575,29 @@ server <- shinyServer(function(input, output   ) {
       foo <- sort(trt[,"diff"])
       A <- mean(foo < input$trt)*length(foo)   # shown in red
       
-      plot(foo, main="Treated arm",
+      
+      foo <- data.frame(foo, col1=NA, col2=NA)
+      
+      foo$col1 =   ifelse(foo$foo <    trt$beta.treatment, "blue" , "black")         
+      foo$col2 =   ifelse(foo$foo >    trt$beta.treatment, "blue" , "black")   
+      
+      if (trt$beta.treatment <  0) {foo$colz = foo$col1} else {foo$colz = foo$col2}
+      
+      tex <- "Individual changes in response in treated arm
+           Suggested individual differences due entirely to regression to the mean
+           and random error (within subject and measurement error)"
+      
+      plot(foo$foo, main=tex,
            ylab= "follow up - baseline", xlab="Individual subjects order by observed response", 
            xlim=c(0,1.05*N/2), ylim=c(mi,ma), #length(trt[,"diff"])
-           col=ifelse(foo > input$trt, 'black', 'blue') ) #, asp=4)
+           col=  foo$colz)
+      
+      # 
+      # 
+      # plot(foo, main="Treated arm",
+      #      ylab= "follow up - baseline", xlab="Individual subjects order by observed response", 
+      #      xlim=c(0,1.05*N/2), ylim=c(mi,ma), #length(trt[,"diff"])
+      #      col=ifelse(foo > input$trt, 'black', 'blue') ) #, asp=4)
      # abline(h=0, lty=2)
      # abline(h=input$trt)
       with(trt, abline(h=mean(beta.treatment), col=c("forestgreen"), lty=c(1), lwd=c(1) ) )
@@ -597,10 +615,28 @@ server <- shinyServer(function(input, output   ) {
       foo <- sort(trt[,"diff"])
       C <- mean(foo < input$trt)*length(foo)   # shown in red
       
-      plot(foo, main="Control arm",
-           ylab= "follow up - baseline", xlab="Individual subjects order by observed treatment response",
-           xlim=c(0,1.05*N/2),ylim=c(mi,ma), #length(trt[,"diff"])
-           col=ifelse(foo > input$trt, 'black', 'blue') )#, asp=4)
+      foo <- data.frame(foo, col1=NA, col2=NA)
+      
+      foo$col1 =   ifelse(foo$foo <    trt$beta.treatment, "blue" , "black")         
+      foo$col2 =   ifelse(foo$foo >    trt$beta.treatment, "blue" , "black")   
+      
+      if (trt$beta.treatment <  0) {foo$colz = foo$col1} else {foo$colz = foo$col2}
+      
+      tex <- "Individual changes in response in treated arm
+           Suggested individual differences due entirely to regression to the mean
+           and random error (within subject and measurement error)"
+      
+      plot(foo$foo, main=tex,
+           ylab= "follow up - baseline", xlab="Individual subjects order by observed response", 
+           xlim=c(0,1.05*N/2), ylim=c(mi,ma), #length(trt[,"diff"])
+           col=  foo$colz)
+      
+      # 
+      # 
+      # plot(foo, main="Control arm",
+      #      ylab= "follow up - baseline", xlab="Individual subjects order by observed treatment response",
+      #      xlim=c(0,1.05*N/2),ylim=c(mi,ma), #length(trt[,"diff"])
+      #      col=ifelse(foo > input$trt, 'black', 'blue') )#, asp=4)
     #  abline(h=0, lty=2)
      # abline(h=input$trt)
       with(trt, abline(h=mean(beta.treatment), col=c("forestgreen"), lty=c(1), lwd=c(1) ) )
@@ -626,12 +662,28 @@ server <- shinyServer(function(input, output   ) {
       trt <- trial[trial$treat==1,]
       trt$diff <- trt$y.1observed - trt$y.0observed
       
+      trt$col1 =   ifelse(trt$diff <  (sample$trt), "blue" , "black")         
+      trt$col2 =   ifelse(trt$diff >  (sample$trt), "blue" , "black")           
       
-      # par(mfrow=c(2,2))
-      with(trt, plot(diff ~  y.0observed, col=ifelse(diff < sample$trt, 'blue', 'black'), pch=16
+      
+    # par(mfrow=c(2,2))
+      with(trt, plot(diff ~  y.0observed,
+                     
+                     col=  ifelse(beta.treatment <  0, trt$col1 , 
+                                  ifelse(beta.treatment >  0, trt$col2 ,    NA )) ,
+                     
+                     
+                     pch=16
                      , xlab="observed baseline",  ylab="follow up - baseline"  ,
                      main="Treatment arm: Individual changes against baseline, observed responders in blue", cex.main =1,
                      ylim=c(mi,ma), xlim=c(mix,max) ))
+      
+      
+      # par(mfrow=c(2,2))
+      # with(trt, plot(diff ~  y.0observed, col=ifelse(diff < sample$trt, 'blue', 'black'), pch=16
+      #                , xlab="observed baseline",  ylab="follow up - baseline"  ,
+      #                main="Treatment arm: Individual changes against baseline, observed responders in blue", cex.main =1,
+      #                ylim=c(mi,ma), xlim=c(mix,max) ))
       with(trt, abline(lm(diff ~  y.0observed), col=c("red"), lty=c(2), lwd=c(2) ) )
       with(trt, abline(h=mean(beta.treatment), col=c("forestgreen"), lty=c(1), lwd=c(1) ) )
       with(trt, abline(h=0, col="black", lty="dashed")) 
@@ -644,15 +696,34 @@ server <- shinyServer(function(input, output   ) {
       with(trt, cor.test( diff,   y.0observed, method="pearson"))
       
      
-      par(bg = 'blue')
-      with(ctr, plot(diff ~  y.0observed, col=ifelse(diff <  sample$trt, 'blue', 'black'), pch=16
+      # par(bg = 'blue')
+      # with(ctr, plot(diff ~  y.0observed, col=ifelse(diff <  sample$trt, 'blue', 'black'), pch=16
+      #                , xlab="observed baseline",  ylab="follow up - baseline"  ,
+      #                main="Control arm:  Individual changes against baseline, observed responders in blue", cex.main =1,
+      #                ylim=c(mi,ma), xlim=c(mix,max) ))
+      # with(ctr, abline(lm(diff ~  y.0observed), col=c("red"), lty=c(2), lwd=c(2) ) )
+      # with(ctr, abline(h=mean(beta.treatment), col=c("forestgreen"), lty=c(1), lwd=c(1) ) )
+      # with(ctr, abline(h=0, col="black", lty="dashed"))
+      
+      
+      ctr$col1 =   ifelse(ctr$diff <  (sample$trt), "blue" , "black")         
+      ctr$col2 =   ifelse(ctr$diff >  (sample$trt), "blue" , "black")   
+      
+      with(ctr, plot(diff ~  y.0observed, 
+                     
+                     # col=ifelse(diff <  sample$trt, 'blue', 'black'), 
+                     col=  ifelse(beta.treatment <  0, ctr$col1 , 
+                                  ifelse(beta.treatment >  0, ctr$col2 ,    NA )) ,
+                     
+                     
+                     pch=16
                      , xlab="observed baseline",  ylab="follow up - baseline"  ,
                      main="Control arm:  Individual changes against baseline, observed responders in blue", cex.main =1,
                      ylim=c(mi,ma), xlim=c(mix,max) ))
-      with(ctr, abline(lm(diff ~  y.0observed), col=c("red"), lty=c(2), lwd=c(2) ) )
-      with(ctr, abline(h=mean(beta.treatment), col=c("forestgreen"), lty=c(1), lwd=c(1) ) )
-      with(ctr, abline(h=0, col="black", lty="dashed"))
       #abline(h = xpoints, col = "pink", lwd = 1000)
+       with(ctr, abline(lm(diff ~  y.0observed), col=c("red"), lty=c(2), lwd=c(2) ) )
+       with(ctr, abline(h=mean(beta.treatment), col=c("forestgreen"), lty=c(1), lwd=c(1) ) )
+       with(ctr, abline(h=0, col="black", lty="dashed"))
       
       with(ctr, cor.test( diff,   y.0observed, method="pearson"))
       
