@@ -29,6 +29,15 @@ is.even <- function(x){ x %% 2 == 0 }
 
 # Individual response to treatment: is it a valid assumption senn
 # 1- pnorm((250-200)/sqrt(100^2+100^2))
+
+# To duplicate stephen senn's paper choose high power and low alpha. Individual response to treatment: is it a valid assumption? 
+# select treatment effect of -2.5
+# pop mean 0 (does not matter)
+# pop sd 4 (does not matter)
+# random noise =1
+# eligibilty =-5, drop this down so vast majority are included
+# clinically relvant difference -2
+
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ui <- fluidPage(theme = shinytheme("paper"), #https://www.rdocumentation.org/packages/shinythemes/versions/1.1.2
                 
@@ -43,7 +52,7 @@ ui <- fluidPage(theme = shinytheme("paper"), #https://www.rdocumentation.org/pac
 
             
                 
-                h3("Responders non responders fallacy"),
+                h3("Responders non responders fallacy...even if treatment effect is truly constant, some patients are observed to respond....random effects model"),
                 
     
                 h4("'The essential feature of a randomised trial is the comparison between groups. Within group analyses do
@@ -122,38 +131,38 @@ ui <- fluidPage(theme = shinytheme("paper"), #https://www.rdocumentation.org/pac
 
                             sliderInput("power", 
                                         strong("Power"),
-                                        min=.50, max=.99, step=.01, value=.9, 
+                                        min=.80, max=.99, step=.01, value=.99, 
                                         ticks=FALSE),
                             
                             sliderInput("alpha", 
                                         strong("alpha"),
-                                        min=.01, max=.2, step=.01, value=.05, 
+                                        min=.01, max=.2, step=.01, value=.01, 
                                         ticks=FALSE),
 
                             sliderInput("trt",
                                         strong("treatment effect"),
-                                        min=-10, max=10, step=.1, value=-1, ticks=FALSE),
+                                        min=-10, max=10, step=.1, value=-2.5, ticks=FALSE),
                             
                             sliderInput("pop_mu",
                                         strong("population mean"),
-                                        min=-10, max=10, step=1, value=0, ticks=FALSE),
+                                        min=-10, max=10, step=1, value=10, ticks=FALSE),
                             
                             sliderInput("pop_sd",
                                         strong("population sd"),
-                                        min=1, max=10, step=1, value=4, ticks=FALSE),
+                                        min=1, max=10, step=1, value=8, ticks=FALSE),
                             
                             sliderInput("noise",
                                         strong("random noise"),
-                                        min=0, max=4, step=.2, value=2, ticks=FALSE),
+                                        min=0, max=4, step=.2, value=1, ticks=FALSE),
                             
                             
                             sliderInput("eligible",
                                         strong("eligibility, if patient is > this many SDs from population mean "),
-                                        min=-5, max=5, step=1, value=0, ticks=FALSE),
+                                        min=-5, max=5, step=1, value=-5, ticks=FALSE),
                    
                           sliderInput("senn",
                                       strong("Clinical relevant difference"),
-                                      min=-10, max=10, step=.1, value=-1, ticks=FALSE),
+                                      min=-10, max=10, step=.1, value=-2, ticks=FALSE),
                             div(p( strong("References:"))),  
                             
                     
@@ -161,14 +170,14 @@ ui <- fluidPage(theme = shinytheme("paper"), #https://www.rdocumentation.org/pac
                           
                             tags$a(href = "https://www.bmj.com/content/bmj/342/bmj.d561.full.pdf", "[1] Comparisons within randomised groups can be very misleading"),
                             div(p(" ")),
-                            tags$a(href = "https://en.wikipedia.org/wiki/Comprehensive_metabolic_panel", "[2] Comprehensive metabolic panel"),
+                            tags$a(href = "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC524113/pdf/bmj32900966.pdf", "[2] Individual response to treatment: is it a valid assumption?"),
                             div(p(" ")),
-                            tags$a(href = "https://ggplot2.tidyverse.org/reference/geom_boxplot.html", "[3] Boxplots using ggplot2"),
-                            div(p(" ")),
-                            tags$a(href = "https://en.wikipedia.org/wiki/Statistical_process_control", "[4] Statistical process control"),
-                            div(p(" ")),
-                            tags$a(href = "https://twitter.com/f2harrell/status/1220700181496320001", "[5] Purpose of RCT"),
-                            div(p(" ")),
+                            # tags$a(href = "https://ggplot2.tidyverse.org/reference/geom_boxplot.html", "[3] Boxplots using ggplot2"),
+                            # div(p(" ")),
+                            # tags$a(href = "https://en.wikipedia.org/wiki/Statistical_process_control", "[4] Statistical process control"),
+                            # div(p(" ")),
+                            # tags$a(href = "https://twitter.com/f2harrell/status/1220700181496320001", "[5] Purpose of RCT"),
+                            # div(p(" ")),
                         )
                         
                       
@@ -260,8 +269,23 @@ ui <- fluidPage(theme = shinytheme("paper"), #https://www.rdocumentation.org/pac
                                 ) ,
                             
                             #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                            tabPanel("Plot of the treatment effect estimates", 
+                            tabPanel("Clinically relevant difference", 
                                      div(plotOutput("reg.plotx", width=fig.width, height=fig.height)),  
+                                     
+                                     p(strong(" ")),
+                                     p(strong("We duplicate Stephen Senn's example [2], but using a simulated dataset (one realisation). We can calulate 
+                                              the proportion of treated who will fail to respond analytically by 1- pnorm((2.5-2)/sqrt(1^2+1^2))= 0.36, see left plot.
+                                              The blue dashed line defines the clinically relevant differnece. The black dashed line the constant treatment effect applied 
+                                              to EVERYONE in the treated group. Blue circles denote the observed responders.")),
+                                     
+                                     p(strong("(To duplicate Stephen Senn's paper the default values selected are high power and low alpha.
+                                              Select treatment effect of -2.5, population mean and SD do not matter, set random noise to 1, and 
+                                              eligibilty to -5, drop this down so that the vast majority are included, finally set the clinically relvant difference to -2.)"
+                                               )),
+                                  
+                                     
+                                     
+                                     
                             ) ,
                             #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                             tabPanel("Data listing", value=3, 
@@ -300,8 +324,8 @@ server <- shinyServer(function(input, output   ) {
         n <-      pop
         noise <-  input$noise     
         eligible <- input$eligible  
-        
-        return(list( n=n ,  trt=trt , mu=mu, sd=sd, noise=noise, eligible=eligible, power=power, alpha=alpha )) 
+        SENN <- input$senn
+        return(list( n=n ,  trt=trt , mu=mu, sd=sd, noise=noise, eligible=eligible, power=power, alpha=alpha, SENN =SENN )) 
         
     })
     # ---------------------------------------------------------------------------
@@ -535,6 +559,8 @@ server <- shinyServer(function(input, output   ) {
       CN=stats()$CN
       T.SENN =stats()$T.SENN
       C.SENN =stats()$C.SENN
+      TC.SENN =stats()$TC.SENN
+      CT.SENN =stats()$CT.SENN
       # ---------------------------------------------------------------------------
       par(mfrow=c(1,2))
       
@@ -547,10 +573,10 @@ server <- shinyServer(function(input, output   ) {
       
       foo <- data.frame(foo, col1=NA, col2=NA)
       
-      foo$col1 =   ifelse(foo$foo <    trt$beta.treatment, "blue" , "black")         
-      foo$col2 =   ifelse(foo$foo >    trt$beta.treatment, "blue" , "black")   
+      foo$col1 =   ifelse(foo$foo <    sample$SENN, "blue" , "black")         
+      foo$col2 =   ifelse(foo$foo >     sample$SENN, "blue" , "black")   
       
-      if (trt$beta.treatment <  0) {foo$colz = foo$col1} else {foo$colz = foo$col2}
+      if ( sample$SENN <  0) {foo$colz = foo$col1} else {foo$colz = foo$col2}
       
       
       
@@ -558,7 +584,7 @@ server <- shinyServer(function(input, output   ) {
       # names(Z) <- c("N trt","Observed responders trt",  "%" , "N ctrl","Observed responders ctrl" , "%")
       
       
-      tex <- paste0("Treated patients \n N= ",AN,", No of responders= ",A," (",AT,"%)")
+      tex <- paste0("Treated patients \n N= ",AN,", No of responders= ",T.SENN," (",TC.SENN,"%), non responders=",AN-T.SENN," (",100-TC.SENN,"%)")
       
       plot(foo$foo, main=tex,
            ylab= "follow up - baseline", xlab="Individual subjects ordered by observed response", 
@@ -585,9 +611,10 @@ server <- shinyServer(function(input, output   ) {
       
       abline(h=0)
       abline(h=input$trt, lty=2)
+      abline(h=input$senn, lty=2, col="blue")
       # this many were not observed to have reduced response by more than 5
       # wrongly labelled as 'non responders'
-      mean(foo > input$trt)*length(foo)   # shown in red
+    #  mean(foo > input$trt)*length(foo)   # shown in red
       
       # ---------------------------------------------------------------------------
       
@@ -597,16 +624,16 @@ server <- shinyServer(function(input, output   ) {
       
       foo <- data.frame(foo, col1=NA, col2=NA)
       
-      foo$col1 =   ifelse(foo$foo <    trt$beta.treatment, "blue" , "black")         
-      foo$col2 =   ifelse(foo$foo >    trt$beta.treatment, "blue" , "black")   
+      foo$col1 =   ifelse(foo$foo <     sample$SENN, "blue" , "black")         
+      foo$col2 =   ifelse(foo$foo >     sample$SENN, "blue" , "black")   
       
-      if (trt$beta.treatment <  0) {foo$colz = foo$col1} else {foo$colz = foo$col2}
+      if ( sample$SENN <  0) {foo$colz = foo$col1} else {foo$colz = foo$col2}
       
       # tex <- "Individual changes in response in treated arm
       #    Suggested individual differences due entirely to regression to the mean
       #    and random error (within subject and measurement error)"
       
-      tex <- paste0("Control patients \n N= ",CN,", No of responders= ",C," (",CT,"%)")
+      tex <- paste0("Control patients \n N= ",CN,", No of responders= ",C.SENN," (",CT.SENN,"%), non responders=",CN-C.SENN," (",100-CT.SENN,"%)")
       
       plot(foo$foo, main=tex,
            ylab= "follow up - baseline", xlab="Individual subjects ordered by observed response", 
@@ -616,9 +643,10 @@ server <- shinyServer(function(input, output   ) {
       
       abline(h=0)
       abline(h=input$trt, lty=2)
+      abline(h=input$senn, lty=2, col="blue")
       # this many were not observed to have red uced response by more than 5
       # wrongly labelled as 'non responders'
-      mean(foo > input$trt)*length(foo)   # shown in red
+     # mean(foo > input$trt)*length(foo)   # shown in red
       
       par(mfrow=c(1,1))
       # ---------------------------------------------------------------------------
@@ -962,7 +990,8 @@ server <- shinyServer(function(input, output   ) {
           AT <- round(A/length(foo)*100,1)
           AN <- length(foo)
           
-          T.SENN <- mean(foo < sample$senn)*length(foo)
+          T.SENN <- mean(foo < sample$SENN)*length(foo)
+          TC.SENN <- round(T.SENN/length(foo)*100,1)
           # ---------------------------------------------------------------------------
           
           trt <- trial[trial$treat==0,]
@@ -972,7 +1001,8 @@ server <- shinyServer(function(input, output   ) {
           CT <- round(C/length(foo)*100,1)
           CN = length(foo)
           
-          C.SENN <-mean(foo < sample$senn)*length(foo)
+          C.SENN <-mean(foo < sample$SENN)*length(foo)
+          CT.SENN <- round(C.SENN/length(foo)*100,1)
       
       } else { 
         
@@ -986,7 +1016,9 @@ server <- shinyServer(function(input, output   ) {
           AN <- length(foo)
           
           
-          T.SENN <- mean(foo < sample$senn)*length(foo)
+          T.SENN <- mean(foo < sample$SENN)*length(foo)
+          TC.SENN <- round(T.SENN/length(foo)*100,1)
+         
           # ---------------------------------------------------------------------------
           
           trt <- trial[trial$treat==0,]
@@ -996,7 +1028,8 @@ server <- shinyServer(function(input, output   ) {
           CT <- round(C/length(foo)*100,1)
           CN = length(foo)
       
-          C.SENN <-mean(foo < sample$senn)*length(foo)
+          C.SENN <-mean(foo < sample$SENN)*length(foo)
+          CT.SENN <- round(C.SENN/length(foo)*100,1)
       }
       
       
@@ -1005,7 +1038,7 @@ server <- shinyServer(function(input, output   ) {
       names(Z) <- c("N trt","Observed responders trt",  "%" , "N ctrl","Observed responders ctrl" , "%")
       rownames(Z) <- NULL 
       # ---------------------------------------------------------------------------
-      return(list(A=A, AT=AT, C=C, CT= CT, Z=Z, AN=AN, CN=CN)) 
+      return(list(A=A, AT=AT, C=C, CT= CT, Z=Z, AN=AN, CN=CN, T.SENN=T.SENN, TC.SENN=TC.SENN, C.SENN=C.SENN , CT.SENN=CT.SENN)) 
       
     })
    
