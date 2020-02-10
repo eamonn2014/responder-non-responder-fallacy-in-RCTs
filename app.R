@@ -190,40 +190,45 @@ ui <- fluidPage(theme = shinytheme("paper"), #https://www.rdocumentation.org/pac
 
                    ")),
                             #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~end of section to add colour     
-                            tabPanel("Plotting the data", 
+                            tabPanel("Plot observed change in order of magnitude", 
                                      #    h2("Plotting the data"),
                                      div(plotOutput("reg.plot3", width=fig.width, height=fig.height)),  
-                                     h5("Figure 1 Indivduals ordered by increasing observed response in treated (left) and control (right) arms."),
+                                     h5("Figure 1 Observed change in each patient in order of magnitude, treated (left) and control (right) arms."),
                                      
                                      h3(" "),
                                      
-                                     p(strong("Left panel, active group. Observed responders in blue. But **EVERYBODY** responded to the drug **EQUALLY** ! Apparent individual difference is due **ENTIRELY** to 
-                                              random within subject error, measurement error and regression to the mean.")) ,
-                                  #   verbatimTextOutput("A"),
-                                     p(strong("Right panel, control group. Observed responders in blue. But in truth **NO ONE** responded, apparent individual difference is due **ENTIRELY** to random within subject error,
-                                              measurement error and regression to the mean..")) ,
+                                     p(strong("In the data simulation, the ‘true’ value for all treated patients
+                                     decreased by constant value. 
+                                     The individual differences in change suggested by the ﬁgure are due entirely 
+                                     to within-patient variation in baseline and follow-up measurements and regression to the mean.
+                                     Left panel, treated group. Observed responders in blue. But **EVERYBODY** responded to the drug **EQUALLY** ! Apparent individual difference is due **ENTIRELY** to 
+                                              random within subject error, measurement error and regression to the mean. 
+                                              Right panel, control group. Observed responders in blue. But in truth **NO ONE** responded, apparent individual difference is due **ENTIRELY** to random within subject error,
+                                              measurement error and regression to the mean.")),
                                      
                                    #  verbatimTextOutput("C"),
                                      
                                    #  DT::dataTableOutput("tablex"),
                                      
-                                   div( verbatimTextOutput("xx")),
-                                     p(strong("Total sample size:")),
-                                        
+                                  # div( verbatimTextOutput("xx")),
+                                 #    p(strong("Total sample size:")),
+                                #        
                             ) ,
                             #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                            tabPanel("xxxxxxxxxxx",
+                            tabPanel("Plot observed individual change against baseline",
                                      h4("Fxxxxxxxxxxxxxxxxxxxxxxxxxxxx"),
                                      div(plotOutput("res.plot", width=fig.width, height=fig.height)),  
-                                     h5("Figure 2 Observed response by baseline in treated (left) and control (right) arms. "),         
+                                     h5("Figure 2 Observed individual changes plotted against baseline, treated (left) and control (right) arms. "),         
                                      
                                      
-                                     p(strong("xxxxxxxxxxxxxxxxxxxxxxxxxxxx
+                                     p(strong("The negative slope so often seen in this type of plot can be due entirely to regression to the mean and mathematical coupling. Participants with a relatively high measured value
+                                     at baseline will naturally regress towards the mean so that follow-up measurements are lower, and vice versa for participants with a relatively low value
+                                  at baseline. This regression to the mean leads to the artefact of a negative correlation between change and initial value (or any other variable that is correlated with the initial value).
                                               ")),
                             ),
                             
                             #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                            tabPanel("Summary statistics", value=3, 
+                            tabPanel("All plots together", value=3, 
                                     #  h4("xxxxxxxxxxxxxxxxxx"),#
                                      #h6("xxxxxxxxxxxxxxxxxx."),
                                      div(plotOutput("res.plot4", width=fig.width2, height=fig.height2)), 
@@ -231,7 +236,7 @@ ui <- fluidPage(theme = shinytheme("paper"), #https://www.rdocumentation.org/pac
                                         Bottom planels show observed response by baseline in treated (left) and control (right) arms. "),         
                             ) ,
                             #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                            tabPanel("Statistical modelling", value=6, 
+                            tabPanel("ANCOVA model", value=6, 
                                      h4("Modelling"),
                                      p(strong("xxxxxxxxxxxxxxxxxxxxxx.")),
                                    div( verbatimTextOutput("reg.summary2")),
@@ -388,10 +393,19 @@ server <- shinyServer(function(input, output   ) {
         sample <- random.sample()
         N <- make.data()$N
         
+        
         diff <- trial$y.1observed - trial$y.0observed
         mi <-  min( diff)*1.2
         ma <-  max(diff)*1.2
         
+        
+        stats <- stats()
+         A=stats()$A
+         AT=stats()$AT 
+         C=stats()$C    
+         CT=stats()$CT
+         AN=stats()$AN
+         CN=stats()$CN
         # ---------------------------------------------------------------------------
         par(mfrow=c(1,2))
         
@@ -409,15 +423,19 @@ server <- shinyServer(function(input, output   ) {
         
         if (trt$beta.treatment <  0) {foo$colz = foo$col1} else {foo$colz = foo$col2}
       
-        tex <- "Individual changes in response in treated arm
-           Suggested individual differences due entirely to regression to the mean
-           and random error (within subject and measurement error)"
+        
+        
+        # Z <- data.frame(AN=AN, A=A, AT=AT, CN=CN, C=C, CT= CT)
+        # names(Z) <- c("N trt","Observed responders trt",  "%" , "N ctrl","Observed responders ctrl" , "%")
+        
+        
+        tex <- paste0("Treated patients \n N= ",AN,", No of responders= ",A," (",AT,"%)")
         
         plot(foo$foo, main=tex,
-             ylab= "follow up - baseline", xlab="Individual subjects order by observed response", 
+             ylab= "follow up - baseline", xlab="Individual subjects ordered by observed response", 
              xlim=c(0, xup), ylim=c(mi,ma), #length(trt[,"diff"])
              col=  foo$colz)
-        
+        grid(nx = NULL, ny = NULL, col = "lightgray", lty = "dotted")
         
         
       
@@ -436,8 +454,8 @@ server <- shinyServer(function(input, output   ) {
         
         
         
-        abline(h=0, lty=2)
-        abline(h=input$trt)
+        abline(h=0)
+        abline(h=input$trt, lty=2)
         # this many were not observed to have reduced response by more than 5
         # wrongly labelled as 'non responders'
         mean(foo > input$trt)*length(foo)   # shown in red
@@ -455,17 +473,20 @@ server <- shinyServer(function(input, output   ) {
         
         if (trt$beta.treatment <  0) {foo$colz = foo$col1} else {foo$colz = foo$col2}
         
-        tex <- "Individual changes in response in treated arm
-           Suggested individual differences due entirely to regression to the mean
-           and random error (within subject and measurement error)"
+        # tex <- "Individual changes in response in treated arm
+        #    Suggested individual differences due entirely to regression to the mean
+        #    and random error (within subject and measurement error)"
+        
+        tex <- paste0("Control patients \n N= ",CN,", No of responders= ",C," (",CT,"%)")
         
         plot(foo$foo, main=tex,
-             ylab= "follow up - baseline", xlab="Individual subjects order by observed response", 
+             ylab= "follow up - baseline", xlab="Individual subjects ordered by observed response", 
              xlim=c(0, xup), ylim=c(mi,ma), #length(trt[,"diff"])
              col=  foo$colz)
-       
-        abline(h=0, lty=2)
-        abline(h=input$trt)
+        grid(nx = NULL, ny = NULL, col = "lightgray", lty = "dotted")
+        
+        abline(h=0)
+        abline(h=input$trt, lty=2)
         # this many were not observed to have red uced response by more than 5
         # wrongly labelled as 'non responders'
          mean(foo > input$trt)*length(foo)   # shown in red
@@ -483,6 +504,13 @@ server <- shinyServer(function(input, output   ) {
       
         trial <- make.data()$trial
         
+        stats <- stats()
+        A=stats()$A
+        AT=stats()$AT 
+        C=stats()$C    
+        CT=stats()$CT
+        AN=stats()$AN
+        CN=stats()$CN
         diff <- trial$y.1observed - trial$y.0observed
         mi <-  min( diff)*1.2
         ma <-  max(diff)*1.2
@@ -511,16 +539,27 @@ server <- shinyServer(function(input, output   ) {
                                    ifelse(beta.treatment >  0, trt$col2 ,    NA )) ,
                        pch=16
                        , xlab="observed baseline",  ylab="follow up - baseline"  ,
-         main=paste0("Treatment arm: Individual changes against baseline, observed responders in blue\nPearson's correlation ",cr), cex.main =1.25,
+         main=paste0("Treatment arm: Individual changes against baseline, observed responders in blue\nPearson's correlation ",cr
+                      ," ; treated patients \n N= ",AN,", No of responders= ",A," (",AT,"%)")
+                     
+                     , cex.main =1.25,
                        ylim=c(mi,ma), xlim=c(mix,max) ))
      
+        # 
+        # with(trt, abline(lm(diff ~  y.0observed)))
+        # with(trt, abline(h=mean(beta.treatment), lty=2))
+        # with(trt, abline(h=0, col="red" ))
         
-        with(trt, abline(lm(diff ~  y.0observed)))
-        with(trt, abline(h=mean(beta.treatment), lty=2))
-        with(trt, abline(h=0, col="red", lty="dashed"))
-        # with(trt, abline(h=max, col="white", lty="dashed"))
-        # with(trt, abline(h=mix, col="white", lty="dashed"))
-        #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+        
+        with(trt, abline(lm(diff ~  y.0observed), col=c("red"), lty=c(1), lwd=c(2) ) )
+        with(trt, abline(h=mean(beta.treatment), col=c("forestgreen"), lty="dashed", lwd=c(2) ) )
+        #with(trt, abline(h=0, col="black" , lty=1)) 
+        # abline(h=0)
+        # 
+        grid(nx = NULL, ny = NULL, col = "lightgray", lty = "dotted")
+        abline(h=0, lwd=c(1))
+            #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         
         ctr <- trial[trial$treat==0,]
         ctr$diff <- ctr$y.1observed - ctr$y.0observed
@@ -538,15 +577,19 @@ server <- shinyServer(function(input, output   ) {
                                     ifelse(beta.treatment >  0, ctr$col2 ,    NA )) ,
                       pch=16
                , xlab="observed baseline",  ylab="follow up - baseline"  ,
-              main=paste0("Control arm:  Individual changes against baseline, observed responders in blue\nPearson's correlation ",cr), cex.main =1.25,
+              main=paste0("Control arm:  Individual changes against baseline, observed responders in blue\nPearson's correlation ",cr
+                         , "; control patients \n N= ",CN,", No of responders= ",C," (",CT,"%)")
+                          , cex.main =1.25,
              ylim=c(mi,ma), xlim=c(mix,max) ) ) 
     
-        with(ctr, abline(lm(diff ~  y.0observed)))
-        with(ctr, abline(h=mean(beta.treatment), lty=2))
-        with(ctr, abline(h=0, col="red", lty="dashed"))
         
-        # with(ctr, abline(h=max, col="white", lty="dashed"))
-        # with(ctr, abline(h=mix, col="white", lty="dashed"))
+        with(ctr, abline(lm(diff ~  y.0observed), col=c("red"), lty=c(1), lwd=c(2) ) )
+       # with(ctr, abline(h=mean(beta.treatment), col=c("forestgreen"), lty="dashed", lwd=c(1) ) )
+      #  with(ctr, abline(h=0, col="black" , lty=4)) 
+        
+        grid(nx = NULL, ny = NULL, col = "lightgray", lty = "dotted")
+        abline(h=0, lwd=c(1))
+        with(ctr, abline(h=(beta.treatment), col=c("forestgreen"), lty="dashed",  lwd=c(2) ))
         par(mfrow=c(1,1))
 
     })
@@ -561,6 +604,14 @@ server <- shinyServer(function(input, output   ) {
       trial <- make.data()$trial
       
       N <- make.data()$N
+      
+      stats <- stats()
+      A=stats()$A
+      AT=stats()$AT 
+      C=stats()$C    
+      CT=stats()$CT
+      AN=stats()$AN
+      CN=stats()$CN
       
       diff <- trial$y.1observed - trial$y.0observed
       mi <-  min( diff)*1.2
@@ -588,7 +639,7 @@ server <- shinyServer(function(input, output   ) {
       tex <- "Individual changes in response in treated arm
            Suggested individual differences due entirely to regression to the mean
            and random error (within subject and measurement error)"
-      
+      tex <- paste0("Treated patients: N= ",AN,", No of responders= ",A," (",AT,"%)")
       plot(foo$foo, main=tex, 
            ylab= "follow up - baseline", xlab="Individual subjects order by observed response", 
            xlim=c(0, xup), ylim=c(mi,ma), #length(trt[,"diff"])
@@ -602,13 +653,18 @@ server <- shinyServer(function(input, output   ) {
       #      col=ifelse(foo > input$trt, 'black', 'blue') ) #, asp=4)
      # abline(h=0, lty=2)
      # abline(h=input$trt)
-      with(trt, abline(h=mean(beta.treatment), col=c("forestgreen"), lty=c(1), lwd=c(1) ) )
-      with(trt, abline(h=0, col="black", lty="dashed")) 
-      with(trt, abline(v=A, col="black", lty="dashed"))
+    #  with(trt, abline(h=mean(beta.treatment), col=c("forestgreen"), lty=c(1), lwd=c(1) ) )
+   #   with(trt, abline(h=0, col="black", lty="dashed")) 
+      #with(trt, abline(v=A, col="black", lty="dashed"))
       # this many were not observed to have reduced response by more than 5
       # wrongly labelled as 'non responders'
-     
+    #  grid(nx = NULL, ny = NULL, col = "lightgray", lty = "dotted")
       
+      
+      grid(nx = NULL, ny = NULL, col = "lightgray", lty = "dotted")
+      with(trt, abline(v=A, col="black", lty="dashed"))
+      with(trt, abline(h=0, col="black", lty=1))
+      with(trt, abline(h=(beta.treatment), col=c("forestgreen"), lty=c(2), lwd=c(1) ) )
       # ---------------------------------------------------------------------------
       
    
@@ -628,27 +684,18 @@ server <- shinyServer(function(input, output   ) {
       tex <- "Individual changes in response in treated arm
            Suggested individual differences due entirely to regression to the mean
            and random error (within subject and measurement error)"
-      
+      tex <- paste0("Control patients: N= ",CN,", No of responders= ",C," (",CT,"%)")
       plot(foo$foo, main=tex,
            ylab= "follow up - baseline", xlab="Individual subjects order by observed response", 
            xlim=c(0, xup), ylim=c(mi,ma), #length(trt[,"diff"])
            col=  foo$colz)
       
-      # 
-      # 
-      # plot(foo, main="Control arm",
-      #      ylab= "follow up - baseline", xlab="Individual subjects order by observed treatment response",
-      #      xlim=c(0,1.05*N/2),ylim=c(mi,ma), #length(trt[,"diff"])
-      #      col=ifelse(foo > input$trt, 'black', 'blue') )#, asp=4)
-    #  abline(h=0, lty=2)
-     # abline(h=input$trt)
-      with(trt, abline(h=mean(beta.treatment), col=c("forestgreen"), lty=c(1), lwd=c(1) ) )
-      with(trt, abline(h=0, col="black", lty="dashed")) 
+
+      grid(nx = NULL, ny = NULL, col = "lightgray", lty = "dotted")
       with(trt, abline(v=C, col="black", lty="dashed"))
-      # this many were not observed to have reduced response by more than 5
-      # wrongly labelled as 'non responders'
-     #C <- mean(foo > input$trt)*length(foo)   # shown in red
-      
+      with(trt, abline(h=0, col="black", lty=1))
+      with(trt, abline(h=(beta.treatment), col=c("forestgreen"), lty=c(2), lwd=c(1) ) )
+
     
       #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       trial <- make.data()$trial
@@ -665,6 +712,11 @@ server <- shinyServer(function(input, output   ) {
       trt <- trial[trial$treat==1,]
       trt$diff <- trt$y.1observed - trt$y.0observed
       
+      cr <- with(trt, cor.test( diff,   y.0observed, method="pearson"))
+      cr$estimate[1][[1]]
+      cr$conf.int[1:2]
+      cr <- paste0( p2(cr$estimate),", 95%CI (",p2(cr$conf.int[1]),", " ,p2(cr$conf.int[2]), " )")
+      
       trt$col1 =   ifelse(trt$diff <  (sample$trt), "blue" , "black")         
       trt$col2 =   ifelse(trt$diff >  (sample$trt), "blue" , "black")           
       
@@ -678,7 +730,13 @@ server <- shinyServer(function(input, output   ) {
                      
                      pch=16
                      , xlab="observed baseline",  ylab="follow up - baseline"  ,
-                     main="Treatment arm: Individual changes against baseline, observed responders in blue", cex.main =1,
+                     
+                     main=paste0("Treatment arm: observed responders in blue\nPearson's correlation ",cr),
+                     
+                     
+                    # main="Treatment arm: Individual changes against baseline, observed responders in blue", 
+                     
+                     cex.main =1.25,
                      ylim=c(mi,ma), xlim=c(mix,max) ))
       
       
@@ -687,17 +745,28 @@ server <- shinyServer(function(input, output   ) {
       #                , xlab="observed baseline",  ylab="follow up - baseline"  ,
       #                main="Treatment arm: Individual changes against baseline, observed responders in blue", cex.main =1,
       #                ylim=c(mi,ma), xlim=c(mix,max) ))
-      with(trt, abline(lm(diff ~  y.0observed), col=c("red"), lty=c(2), lwd=c(2) ) )
-      with(trt, abline(h=mean(beta.treatment), col=c("forestgreen"), lty=c(1), lwd=c(1) ) )
-      with(trt, abline(h=0, col="black", lty="dashed")) 
+      # with(trt, abline(lm(diff ~  y.0observed), col=c("red"), lty=c(2), lwd=c(2) ) )
+      # with(trt, abline(h=mean(beta.treatment), col=c("forestgreen"), lty=c(1), lwd=c(1) ) )
+      # with(trt, abline(h=0, col="black", lty="dashed")) 
+      # grid(nx = NULL, ny = NULL, col = "lightgray", lty = "dotted")
       
+      
+      grid(nx = NULL, ny = NULL, col = "lightgray", lty = "dotted")
+      with(trt, abline(h=0, col="black", lty=1))
+      with(trt, abline(lm(diff ~  y.0observed), col=c("red"), lty=c(1), lwd=c(1) ) )
+      with(trt, abline(h=(beta.treatment), col=c("forestgreen"), lty=c(2), lwd=c(1) ) )
       #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       
       ctr <- trial[trial$treat==0,]
       ctr$diff <- ctr$y.1observed - ctr$y.0observed
       
-      with(trt, cor.test( diff,   y.0observed, method="pearson"))
+     # with(trt, cor.test( diff,   y.0observed, method="pearson"))
       
+      
+      cr <- with(ctr, cor.test( diff,   y.0observed, method="pearson"))
+      cr$estimate[1][[1]]
+      cr$conf.int[1:2]
+      cr <- paste0( p2(cr$estimate),", 95%CI (",p2(cr$conf.int[1]),", " ,p2(cr$conf.int[2]), " )")
      
       # par(bg = 'blue')
       # with(ctr, plot(diff ~  y.0observed, col=ifelse(diff <  sample$trt, 'blue', 'black'), pch=16
@@ -721,15 +790,24 @@ server <- shinyServer(function(input, output   ) {
                      
                      pch=16
                      , xlab="observed baseline",  ylab="follow up - baseline"  ,
-                     main="Control arm:  Individual changes against baseline, observed responders in blue", cex.main =1,
+                     
+                     main=paste0("Treatment arm: observed responders in blue\nPearson's correlation ",cr),
+                     
+                     
+                     # main="Treatment arm: Individual changes against baseline, observed responders in blue", 
+                     
+                     cex.main =1.25,
+                     #main="Control arm:  Individual changes against baseline, observed responders in blue", cex.main =1,
                      ylim=c(mi,ma), xlim=c(mix,max) ))
-      #abline(h = xpoints, col = "pink", lwd = 1000)
-       with(ctr, abline(lm(diff ~  y.0observed), col=c("red"), lty=c(2), lwd=c(2) ) )
-       with(ctr, abline(h=mean(beta.treatment), col=c("forestgreen"), lty=c(1), lwd=c(1) ) )
-       with(ctr, abline(h=0, col="black", lty="dashed"))
+    
       
-      with(ctr, cor.test( diff,   y.0observed, method="pearson"))
-      
+        
+       grid(nx = NULL, ny = NULL, col = "lightgray", lty = "dotted")
+       with(ctr, abline(h=0, col="black", lty=1))
+       with(ctr, abline(lm(diff ~  y.0observed), col=c("red"), lty=c(1), lwd=c(1) ) )
+       with(ctr, abline(h=(beta.treatment), col=c("forestgreen"), lty=c(2), lwd=c(1) ) )
+       
+       
       #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       par(mfrow=c(1,1))
       
@@ -790,7 +868,7 @@ server <- shinyServer(function(input, output   ) {
       names(Z) <- c("N trt","Observed responders trt",  "%" , "N ctrl","Observed responders ctrl" , "%")
       rownames(Z) <- NULL 
       # ---------------------------------------------------------------------------
-      return(list(A=A, AT=AT, C=C, CT= CT, Z=Z)) 
+      return(list(A=A, AT=AT, C=C, CT= CT, Z=Z, AN=AN, CN=CN)) 
       
     })
    
