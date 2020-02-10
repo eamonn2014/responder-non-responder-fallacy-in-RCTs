@@ -43,16 +43,20 @@ ui <- fluidPage(theme = shinytheme("paper"), #https://www.rdocumentation.org/pac
 
             
                 
-                h3("Responders non responders fallacy - lets power this...Bland ref seen ref."),
+                h3("Responders non responders fallacy"),
                 
     
-                
+                h4("'The essential feature of a randomised trial is the comparison between groups. Within group analyses do
+                not address a meaningful question: the question is not whether there
+                is a change from baseline, but whether any change is greater in one group than the other [1].'
+                We perform a simulation of a randomised control trial demonstrating one reason why it is wrong to analyse arms 
+                of a trial separately aiming to identify responders and non responders."), 
                 
                 
                # shinyUI(pageWithSidebar(
             
                     
-                   titlePanel("Hello Shiny!"),
+              #     titlePanel("Hello Shiny!"),
                    
                    
                    
@@ -77,8 +81,18 @@ ui <- fluidPage(theme = shinytheme("paper"), #https://www.rdocumentation.org/pac
                       
                       
                       
-                        div(p("  I perform a simulation of a randomised control trial demonstrating one reason why it is wrong to analyse arms 
-                        of a trial separately aiming to identify responders and non responders. 
+                        div(p("
+                        The first slider sets the power and the next alpha level, so we can power the trial as we wish. The next slider again is the treatment effect. 
+                        All patients in the treatment arm are given this effect. So a constant treatment is given to ALL in the treated group.
+                        Similarly NO ONE in the control group receives any treatment effect. The next two sliders are the population mean and sd, this sd is the between 
+                        person variation. The random noise slide is a term representing the within person variation and measurement variation. The next slide imposes if desired
+                        an inclusion criteria based on the response value.
+                        
+                        
+                        
+                        
+                        
+                        
                      ")),
                         
                         div(
@@ -103,9 +117,8 @@ ui <- fluidPage(theme = shinytheme("paper"), #https://www.rdocumentation.org/pac
                     
                             
                             
-                            div(("  
-                           xxxxxxxxxxxxxx  ")),
-                            br(),
+                           # div((" ")),
+                            #br(),
 
                             sliderInput("power", 
                                         strong("Power"),
@@ -119,7 +132,7 @@ ui <- fluidPage(theme = shinytheme("paper"), #https://www.rdocumentation.org/pac
 
                             sliderInput("trt",
                                         strong("treatment effect"),
-                                        min=-10, max=10, step=.2, value=-1, ticks=FALSE),
+                                        min=-10, max=10, step=.1, value=-1, ticks=FALSE),
                             
                             sliderInput("pop_mu",
                                         strong("population mean"),
@@ -135,16 +148,18 @@ ui <- fluidPage(theme = shinytheme("paper"), #https://www.rdocumentation.org/pac
                             
                             
                             sliderInput("eligible",
-                                        strong("eligible if multiple SD from population mean "),
-                                        min=-3, max=3, step=1, value=0, ticks=FALSE),
+                                        strong("eligibility, if patient is > this many SDs from population mean "),
+                                        min=-5, max=5, step=1, value=0, ticks=FALSE),
                    
-                            
+                          sliderInput("senn",
+                                      strong("Clinical relevant difference"),
+                                      min=-10, max=10, step=.1, value=-1, ticks=FALSE),
                             div(p( strong("References:"))),  
                             
                     
                      
                           
-                            tags$a(href = "https://en.wikipedia.org/wiki/Anscombe%27s_quartet", "[1] Anscombe's quartet"),
+                            tags$a(href = "https://www.bmj.com/content/bmj/342/bmj.d561.full.pdf", "[1] Comparisons within randomised groups can be very misleading"),
                             div(p(" ")),
                             tags$a(href = "https://en.wikipedia.org/wiki/Comprehensive_metabolic_panel", "[2] Comprehensive metabolic panel"),
                             div(p(" ")),
@@ -193,18 +208,18 @@ ui <- fluidPage(theme = shinytheme("paper"), #https://www.rdocumentation.org/pac
                             tabPanel("Plot observed change in order of magnitude", 
                                      #    h2("Plotting the data"),
                                      div(plotOutput("reg.plot3", width=fig.width, height=fig.height)),  
-                                     h5("Figure 1 Observed change in each patient in order of magnitude, treated (left) and control (right) arms."),
+                                     h5("Figure 1 Observed change in each patient in order of magnitude, blue observed 'responders'. Treated (left) and control arm (right)."),
                                      
                                      h3(" "),
                                      
                                      p(strong("In the data simulation, the ‘true’ value for all treated patients
-                                     decreased by constant value. 
-                                     The individual differences in change suggested by the ﬁgure are due entirely 
-                                     to within-patient variation in baseline and follow-up measurements and regression to the mean.
-                                     Left panel, treated group. Observed responders in blue. But **EVERYBODY** responded to the drug **EQUALLY** ! Apparent individual difference is due **ENTIRELY** to 
-                                              random within subject error, measurement error and regression to the mean. 
-                                              Right panel, control group. Observed responders in blue. But in truth **NO ONE** responded, apparent individual difference is due **ENTIRELY** to random within subject error,
-                                              measurement error and regression to the mean.")),
+                                     changed by a constant value, indicated by the dashed horizontal line.
+                                     The left panel are the treated patients only, with observed 'responders' in blue.
+                                     But **EVERYBODY** responded to the drug **EQUALLY** ! 
+                                
+                                              The right panel is the control group. Observed responders in blue. 
+                                              But in truth **NO ONE** responded, apparent individual difference is due **ENTIRELY** to random within subject error,
+                                              measurement error and regression to the mean. Slide the 'random noise' to zero to see.")),
                                      
                                    #  verbatimTextOutput("C"),
                                      
@@ -216,7 +231,7 @@ ui <- fluidPage(theme = shinytheme("paper"), #https://www.rdocumentation.org/pac
                             ) ,
                             #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                             tabPanel("Plot observed individual change against baseline",
-                                     h4("Fxxxxxxxxxxxxxxxxxxxxxxxxxxxx"),
+                                     #h4("Fxxxxxxxxxxxxxxxxxxxxxxxxxxxx"),
                                      div(plotOutput("res.plot", width=fig.width, height=fig.height)),  
                                      h5("Figure 2 Observed individual changes plotted against baseline, treated (left) and control (right) arms. "),         
                                      
@@ -246,7 +261,7 @@ ui <- fluidPage(theme = shinytheme("paper"), #https://www.rdocumentation.org/pac
                             
                             #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                             tabPanel("Plot of the treatment effect estimates", 
-       
+                                     div(plotOutput("reg.plotx", width=fig.width, height=fig.height)),  
                             ) ,
                             #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                             tabPanel("Data listing", value=3, 
@@ -328,7 +343,7 @@ server <- shinyServer(function(input, output   ) {
         y.0true <- rnorm(n, pop_mu, pop_sd)                  # true baseline
         y.0observed <- y.0true + rnorm(n, 0, 1*noise)        # observed baseline 
         
-        eligible <- ifelse(y.0observed > ur.eligible, 1, 0)  # 1sd above norm eligible for trial
+        eligible <- ifelse(y.0observed > ur.eligible*(pop_mu+pop_sd), 1, 0)  # sd away from norm eligible for trial
         treat <- 1*(runif(n)<.5)                             # random treatment allocation
         y.1true <- y.0true + (treat*beta.treatment)          # true follow up, treated only respond
         y.1observed <- y.1true + rnorm(n, 0, 1*noise)        # observed follow up, noise added 
@@ -406,6 +421,8 @@ server <- shinyServer(function(input, output   ) {
          CT=stats()$CT
          AN=stats()$AN
          CN=stats()$CN
+         T.SENN =stats()$T.SENN
+         C.SENN =stats()$C.SENN
         # ---------------------------------------------------------------------------
         par(mfrow=c(1,2))
         
@@ -497,6 +514,117 @@ server <- shinyServer(function(input, output   ) {
     
     
     # --------------------------------------------------------------------------
+    output$reg.plotx <- renderPlot({         
+      
+      trial <- make.data()$trial
+      sample <- random.sample()
+      N <- make.data()$N
+      
+      
+      diff <- trial$y.1observed - trial$y.0observed
+      mi <-  min( diff)*1.2
+      ma <-  max(diff)*1.2
+      
+      
+      stats <- stats()
+      A=stats()$A
+      AT=stats()$AT 
+      C=stats()$C    
+      CT=stats()$CT
+      AN=stats()$AN
+      CN=stats()$CN
+      T.SENN =stats()$T.SENN
+      C.SENN =stats()$C.SENN
+      # ---------------------------------------------------------------------------
+      par(mfrow=c(1,2))
+      
+      xup <-  max(table(trial$treat))  # new
+      
+      trt <- trial[trial$treat==1,]
+      trt$diff <- trt$y.1observed - trt$y.0observed
+      
+      foo <- sort(trt[,"diff"])
+      
+      foo <- data.frame(foo, col1=NA, col2=NA)
+      
+      foo$col1 =   ifelse(foo$foo <    trt$beta.treatment, "blue" , "black")         
+      foo$col2 =   ifelse(foo$foo >    trt$beta.treatment, "blue" , "black")   
+      
+      if (trt$beta.treatment <  0) {foo$colz = foo$col1} else {foo$colz = foo$col2}
+      
+      
+      
+      # Z <- data.frame(AN=AN, A=A, AT=AT, CN=CN, C=C, CT= CT)
+      # names(Z) <- c("N trt","Observed responders trt",  "%" , "N ctrl","Observed responders ctrl" , "%")
+      
+      
+      tex <- paste0("Treated patients \n N= ",AN,", No of responders= ",A," (",AT,"%)")
+      
+      plot(foo$foo, main=tex,
+           ylab= "follow up - baseline", xlab="Individual subjects ordered by observed response", 
+           xlim=c(0, xup), ylim=c(mi,ma), #length(trt[,"diff"])
+           col=  foo$colz)
+      grid(nx = NULL, ny = NULL, col = "lightgray", lty = "dotted")
+      
+      
+      
+      # 
+      # 
+      # 
+      # plot(foo, main=tex,
+      #      ylab= "follow up - baseline", xlab="Individual subjects order by observed response", 
+      #      xlim=c(0,1.05*N/2), ylim=c(mi,ma), #length(trt[,"diff"])
+      #      col=  ifelse(beta.treatment <  0, col1 , 
+      #                   ifelse(beta.treatment >  0, col2 ,    NA ) ))
+      #  
+      
+      
+      
+      
+      
+      
+      abline(h=0)
+      abline(h=input$trt, lty=2)
+      # this many were not observed to have reduced response by more than 5
+      # wrongly labelled as 'non responders'
+      mean(foo > input$trt)*length(foo)   # shown in red
+      
+      # ---------------------------------------------------------------------------
+      
+      trt <- trial[trial$treat==0,]
+      trt$diff <- trt$y.1observed - trt$y.0observed
+      foo <- sort(trt[,"diff"])
+      
+      foo <- data.frame(foo, col1=NA, col2=NA)
+      
+      foo$col1 =   ifelse(foo$foo <    trt$beta.treatment, "blue" , "black")         
+      foo$col2 =   ifelse(foo$foo >    trt$beta.treatment, "blue" , "black")   
+      
+      if (trt$beta.treatment <  0) {foo$colz = foo$col1} else {foo$colz = foo$col2}
+      
+      # tex <- "Individual changes in response in treated arm
+      #    Suggested individual differences due entirely to regression to the mean
+      #    and random error (within subject and measurement error)"
+      
+      tex <- paste0("Control patients \n N= ",CN,", No of responders= ",C," (",CT,"%)")
+      
+      plot(foo$foo, main=tex,
+           ylab= "follow up - baseline", xlab="Individual subjects ordered by observed response", 
+           xlim=c(0, xup), ylim=c(mi,ma), #length(trt[,"diff"])
+           col=  foo$colz)
+      grid(nx = NULL, ny = NULL, col = "lightgray", lty = "dotted")
+      
+      abline(h=0)
+      abline(h=input$trt, lty=2)
+      # this many were not observed to have red uced response by more than 5
+      # wrongly labelled as 'non responders'
+      mean(foo > input$trt)*length(foo)   # shown in red
+      
+      par(mfrow=c(1,1))
+      # ---------------------------------------------------------------------------
+    })
+    
+    
     # ---------------------------------------------------------------------------    
     output$res.plot  <- renderPlot({       
         
@@ -826,40 +954,49 @@ server <- shinyServer(function(input, output   ) {
       
       if (sample$trt < 0) {
       # ---------------------------------------------------------------------------
-      N <- nrow(trial)
-      trt <- trial[trial$treat==1,]
-      trt$diff <- trt$y.1observed - trt$y.0observed
-      foo <- sort(trt[,"diff"])
-      A <- mean(foo < sample$trt)*length(foo)   # shown in red
-      AT <- round(A/length(foo)*100,1)
-      AN <- length(foo)
-      # ---------------------------------------------------------------------------
+          N <- nrow(trial)
+          trt <- trial[trial$treat==1,]
+          trt$diff <- trt$y.1observed - trt$y.0observed
+          foo <- sort(trt[,"diff"])
+          A <- mean(foo < sample$trt)*length(foo)   # 
+          AT <- round(A/length(foo)*100,1)
+          AN <- length(foo)
+          
+          T.SENN <- mean(foo < sample$senn)*length(foo)
+          # ---------------------------------------------------------------------------
+          
+          trt <- trial[trial$treat==0,]
+          trt$diff <- trt$y.1observed - trt$y.0observed
+          foo <- sort(trt[,"diff"])
+          C <- mean(foo < sample$trt)*length(foo)   # 
+          CT <- round(C/length(foo)*100,1)
+          CN = length(foo)
+          
+          C.SENN <-mean(foo < sample$senn)*length(foo)
       
-      trt <- trial[trial$treat==0,]
-      trt$diff <- trt$y.1observed - trt$y.0observed
-      foo <- sort(trt[,"diff"])
-      C <- mean(foo < sample$trt)*length(foo)   # sh
-      CT <- round(C/length(foo)*100,1)
-      CN = length(foo)
       } else { 
         
         
-        N <- nrow(trial)
-        trt <- trial[trial$treat==1,]
-        trt$diff <- trt$y.1observed - trt$y.0observed
-        foo <- sort(trt[,"diff"])
-        A <- mean(foo > sample$trt)*length(foo)   # shown in red
-        AT <- round(A/length(foo)*100,1)
-        AN <- length(foo)
-        # ---------------------------------------------------------------------------
-        
-        trt <- trial[trial$treat==0,]
-        trt$diff <- trt$y.1observed - trt$y.0observed
-        foo <- sort(trt[,"diff"])
-        C <- mean(foo > sample$trt)*length(foo)   # sh
-        CT <- round(C/length(foo)*100,1)
-        CN = length(foo)
-    
+          N <- nrow(trial)
+          trt <- trial[trial$treat==1,]
+          trt$diff <- trt$y.1observed - trt$y.0observed
+          foo <- sort(trt[,"diff"])
+          A <- mean(foo > sample$trt)*length(foo)   # 
+          AT <- round(A/length(foo)*100,1)
+          AN <- length(foo)
+          
+          
+          T.SENN <- mean(foo < sample$senn)*length(foo)
+          # ---------------------------------------------------------------------------
+          
+          trt <- trial[trial$treat==0,]
+          trt$diff <- trt$y.1observed - trt$y.0observed
+          foo <- sort(trt[,"diff"])
+          C <- mean(foo > sample$trt)*length(foo)   # 
+          CT <- round(C/length(foo)*100,1)
+          CN = length(foo)
+      
+          C.SENN <-mean(foo < sample$senn)*length(foo)
       }
       
       
