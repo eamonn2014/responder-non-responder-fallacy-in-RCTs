@@ -77,9 +77,9 @@ ui <- fluidPage(theme = shinytheme("paper"), #https://www.rdocumentation.org/pac
                       
                       
                       
-                        div(p("  I perform a simulation of a randomised control trial demonstrating onr reason why it is wrong to analyse arms 
-                        of a trial separately looking to identify responders and non responders. There are two examples the main difference being one simulation is based on parameters 
-                              I made up whilst the other used the example in Stephen Senn's BMJ paper (see the reference in my example)")),
+                        div(p("  I perform a simulation of a randomised control trial demonstrating one reason why it is wrong to analyse arms 
+                        of a trial separately aiming to identify responders and non responders. 
+                     ")),
                         
                         div(
                             
@@ -109,7 +109,7 @@ ui <- fluidPage(theme = shinytheme("paper"), #https://www.rdocumentation.org/pac
 
                             sliderInput("power", 
                                         strong("Power"),
-                                        min=.50, max=1, step=.01, value=.9, 
+                                        min=.50, max=.99, step=.01, value=.9, 
                                         ticks=FALSE),
                             
                             sliderInput("alpha", 
@@ -394,6 +394,8 @@ server <- shinyServer(function(input, output   ) {
         
         # ---------------------------------------------------------------------------
         par(mfrow=c(1,2))
+        
+        xup <-  max(table(trial$treat))  # new
   
         trt <- trial[trial$treat==1,]
         trt$diff <- trt$y.1observed - trt$y.0observed
@@ -413,7 +415,7 @@ server <- shinyServer(function(input, output   ) {
         
         plot(foo$foo, main=tex,
              ylab= "follow up - baseline", xlab="Individual subjects order by observed response", 
-             xlim=c(0,1.05*N/2), ylim=c(mi,ma), #length(trt[,"diff"])
+             xlim=c(0, xup), ylim=c(mi,ma), #length(trt[,"diff"])
              col=  foo$colz)
         
         
@@ -459,7 +461,7 @@ server <- shinyServer(function(input, output   ) {
         
         plot(foo$foo, main=tex,
              ylab= "follow up - baseline", xlab="Individual subjects order by observed response", 
-             xlim=c(0,1.05*N/2), ylim=c(mi,ma), #length(trt[,"diff"])
+             xlim=c(0, xup), ylim=c(mi,ma), #length(trt[,"diff"])
              col=  foo$colz)
        
         abline(h=0, lty=2)
@@ -493,6 +495,10 @@ server <- shinyServer(function(input, output   ) {
         trt <- trial[trial$treat==1,]
         trt$diff <- trt$y.1observed - trt$y.0observed
         
+        cr <- with(trt, cor.test( diff,   y.0observed, method="pearson"))
+        cr$estimate[1][[1]]
+        cr$conf.int[1:2]
+        cr <- paste0( p2(cr$estimate),", 95%CI (",p2(cr$conf.int[1]),", " ,p2(cr$conf.int[2]), " )")
  
         trt$col1 =   ifelse(trt$diff <  (sample$trt), "blue" , "black")         
         trt$col2 =   ifelse(trt$diff >  (sample$trt), "blue" , "black")           
@@ -503,17 +509,11 @@ server <- shinyServer(function(input, output   ) {
 
                   col=  ifelse(beta.treatment <  0, trt$col1 , 
                                    ifelse(beta.treatment >  0, trt$col2 ,    NA )) ,
-                     
-
                        pch=16
                        , xlab="observed baseline",  ylab="follow up - baseline"  ,
-                       main="Treatment arm: Individual changes against baseline, observed responders in blue", cex.main =1,
-                       ylim=c(mi,ma), xlim=c(mix,max) ))
+         main=paste0("Treatment arm: Individual changes against baseline, observed responders in blue\nPearson's correlation ",cr)), cex.main =1,
+                       ylim=c(mi,ma), xlim=c(mix,max) )
      
-        
-        
-        
-        
         
         with(trt, abline(lm(diff ~  y.0observed)))
         with(trt, abline(h=mean(beta.treatment), lty=2))
@@ -523,29 +523,28 @@ server <- shinyServer(function(input, output   ) {
         
         ctr <- trial[trial$treat==0,]
         ctr$diff <- ctr$y.1observed - ctr$y.0observed
-        
-        with(trt, cor.test( diff,   y.0observed, method="pearson"))
-        
+    
+        cr <- with(ctr, cor.test( diff,   y.0observed, method="pearson"))
+        cr$estimate[1][[1]]
+        cr$conf.int[1:2]
+        cr <- paste0( p2(cr$estimate),", 95%CI (",p2(cr$conf.int[1]),", " ,p2(cr$conf.int[2]), " )")
+  
         ctr$col1 =   ifelse(ctr$diff <  (sample$trt), "blue" , "black")         
         ctr$col2 =   ifelse(ctr$diff >  (sample$trt), "blue" , "black")   
         
         with(ctr, plot(diff ~  y.0observed, 
-                       
-                      # col=ifelse(diff <  sample$trt, 'blue', 'black'), 
                        col=  ifelse(beta.treatment <  0, ctr$col1 , 
                                     ifelse(beta.treatment >  0, ctr$col2 ,    NA )) ,
-                       
-                       
-                       pch=16
-                       , xlab="observed baseline",  ylab="follow up - baseline"  ,
-                       main="Control arm:  Individual changes against baseline, observed responders in blue", cex.main =1,
-                       ylim=c(mi,ma), xlim=c(mix,max) ))
+                      pch=16
+               , xlab="observed baseline",  ylab="follow up - baseline"  ,
+              main=paste0("Control arm:  Individual changes against baseline, observed responders in blue\nPearson's correlation ",cr)), cex.main =1,
+             ylim=c(mi,ma), xlim=c(mix,max) ) 
+    
         with(ctr, abline(lm(diff ~  y.0observed)))
         with(ctr, abline(h=mean(beta.treatment), lty=2))
         with(ctr, abline(h=0, col="red", lty="dashed"))
         
-        
-        with(ctr, cor.test( diff,   y.0observed, method="pearson"))
+         
         par(mfrow=c(1,1))
 
     })
@@ -569,6 +568,7 @@ server <- shinyServer(function(input, output   ) {
       par(mfrow=c(2,2))
       par(bg = 'ivory')
       
+      xup <-  max(table(trial$treat))  # new
       trt <- trial[trial$treat==1,]
       trt$diff <- trt$y.1observed - trt$y.0observed
       
@@ -589,7 +589,7 @@ server <- shinyServer(function(input, output   ) {
       
       plot(foo$foo, main=tex,
            ylab= "follow up - baseline", xlab="Individual subjects order by observed response", 
-           xlim=c(0,1.05*N/2), ylim=c(mi,ma), #length(trt[,"diff"])
+           xlim=c(0, xup), ylim=c(mi,ma), #length(trt[,"diff"])
            col=  foo$colz)
       
       # 
@@ -609,6 +609,7 @@ server <- shinyServer(function(input, output   ) {
       
       # ---------------------------------------------------------------------------
       
+   
       trt <- trial[trial$treat==0,]
       trt$diff <- trt$y.1observed - trt$y.0observed
       
@@ -628,7 +629,7 @@ server <- shinyServer(function(input, output   ) {
       
       plot(foo$foo, main=tex,
            ylab= "follow up - baseline", xlab="Individual subjects order by observed response", 
-           xlim=c(0,1.05*N/2), ylim=c(mi,ma), #length(trt[,"diff"])
+           xlim=c(0, xup), ylim=c(mi,ma), #length(trt[,"diff"])
            col=  foo$colz)
       
       # 
@@ -742,6 +743,8 @@ server <- shinyServer(function(input, output   ) {
       sample <- random.sample()
       
       trial <- make.data()$trial
+      
+      if (sample$trt < 0) {
       # ---------------------------------------------------------------------------
       N <- nrow(trial)
       trt <- trial[trial$treat==1,]
@@ -749,6 +752,7 @@ server <- shinyServer(function(input, output   ) {
       foo <- sort(trt[,"diff"])
       A <- mean(foo < sample$trt)*length(foo)   # shown in red
       AT <- round(A/length(foo)*100,1)
+      AN <- length(foo)
       # ---------------------------------------------------------------------------
       
       trt <- trial[trial$treat==0,]
@@ -756,10 +760,32 @@ server <- shinyServer(function(input, output   ) {
       foo <- sort(trt[,"diff"])
       C <- mean(foo < sample$trt)*length(foo)   # sh
       CT <- round(C/length(foo)*100,1)
+      CN = length(foo)
+      } else { 
+        
+        
+        N <- nrow(trial)
+        trt <- trial[trial$treat==1,]
+        trt$diff <- trt$y.1observed - trt$y.0observed
+        foo <- sort(trt[,"diff"])
+        A <- mean(foo > sample$trt)*length(foo)   # shown in red
+        AT <- round(A/length(foo)*100,1)
+        AN <- length(foo)
+        # ---------------------------------------------------------------------------
+        
+        trt <- trial[trial$treat==0,]
+        trt$diff <- trt$y.1observed - trt$y.0observed
+        foo <- sort(trt[,"diff"])
+        C <- mean(foo > sample$trt)*length(foo)   # sh
+        CT <- round(C/length(foo)*100,1)
+        CN = length(foo)
+    
+      }
       
       
-      Z <- data.frame(A=A, AT=AT, C=C, CT= CT)
-      names(Z) <- c("Observed responders trt",  "%" , "Observed responders ctrl" , "%")
+      
+      Z <- data.frame(AN=AN, A=A, AT=AT, CN=CN, C=C, CT= CT)
+      names(Z) <- c("N trt","Observed responders trt",  "%" , "N ctrl","Observed responders ctrl" , "%")
       rownames(Z) <- NULL 
       # ---------------------------------------------------------------------------
       return(list(A=A, AT=AT, C=C, CT= CT, Z=Z)) 
