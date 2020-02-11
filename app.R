@@ -269,7 +269,7 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                                         The P-Value testing this hypothesis will for the vast majority of the time not reject the null hypothesis.  
                                         This is what we expect, given that the true magnitude of response in the simulation is constant for all 
                                         patients randomised to the treated arm and constant in the control arm (zero). 
-                                        This result provides information that any apparant response differences are negligible 
+                                        This result provides information that any apparent response differences are negligible 
                                         and any analysis of interindividual response is unwarranted."),
                                       div( verbatimTextOutput("reg.lmm0")),
                                       div( verbatimTextOutput("reg.lmm1")),
