@@ -172,8 +172,8 @@ ui <- fluidPage(theme = shinytheme("paper"), #https://www.rdocumentation.org/pac
                             div(p(" ")),
                             tags$a(href = "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC524113/pdf/bmj32900966.pdf", "[2] Individual response to treatment: is it a valid assumption?"),
                             div(p(" ")),
-                            # tags$a(href = "https://ggplot2.tidyverse.org/reference/geom_boxplot.html", "[3] Boxplots using ggplot2"),
-                            # div(p(" ")),
+                            tags$a(href = "https://www.youtube.com/watch?v=uiCd9m6tmt0&feature=youtu.be", "[3] Professor George Davey Smith - Some constraints on the scope and potential of personalised medicine"),
+                            div(p(" ")),
                             # tags$a(href = "https://en.wikipedia.org/wiki/Statistical_process_control", "[4] Statistical process control"),
                             # div(p(" ")),
                             # tags$a(href = "https://twitter.com/f2harrell/status/1220700181496320001", "[5] Purpose of RCT"),
@@ -268,6 +268,23 @@ ui <- fluidPage(theme = shinytheme("paper"), #https://www.rdocumentation.org/pac
                                    div( verbatimTextOutput("reg.summary3")),
                                 ) ,
                             
+                            
+                            tabPanel("Analyse the variance!", value=6, 
+                                     #h4("Modelling"),
+                                     h5("Fisher in a letter on this topic in 1938 said to look at the variance in the outcome [3]. Let us analyze the variance.
+                                        Is there any evidence against the null hypothesis that the variance in the outcome in the trial arms differ? 
+                                        The P-Value testing this hypothesis will the vast majority of the time provide evidence the SD for true interindividual variation 
+                                        is consistent in the trial arms, as it should, given that the true magnitude of response in the simulation is constant for all 
+                                        subjects randomised to the treated arm and constant in the control arm (zero). 
+                                        This result provides information that any apparant response differences are negligible 
+                                        and any analysis of interindividual response is unwarranted."),
+                                      div( verbatimTextOutput("reg.lmm0")),
+                                      div( verbatimTextOutput("reg.lmm1")),
+                                     div( verbatimTextOutput("reg.lmm2")),
+                                     # p(strong("xxxxxxxxxxxxxxxxxxxxxx.")),
+                                     # div( verbatimTextOutput("reg.summary3")),
+                            ) ,
+                            
                             #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                             tabPanel("Clinically relevant difference", 
                                      div(plotOutput("reg.plotx", width=fig.width, height=fig.height)),  
@@ -319,12 +336,17 @@ server <- shinyServer(function(input, output   ) {
         alpha <- input$alpha
         foo <-    input$resample
         trt<-     input$trt
+        
+       
         mu <-     input$pop_mu
         sd <-     input$pop_sd
         n <-      pop
         noise <-  input$noise     
         eligible <- input$eligible  
         SENN <- input$senn
+        
+        
+        
         return(list( n=n ,  trt=trt , mu=mu, sd=sd, noise=noise, eligible=eligible, power=power, alpha=alpha, SENN =SENN )) 
         
     })
@@ -358,10 +380,13 @@ server <- shinyServer(function(input, output   ) {
         pop_sd <-  sample$sd   # between person SD
         ur.eligible <- sample$eligible #89
         
+       
         
         N <- round(power.t.test( delta = beta.treatment, sd= pop_sd , 
                                  sig.level= alpha, power= power,
                                  type="two.sample", alternative=c("two.sided"))$n*2)
+        
+       # beta.treatment <- runif(n,-4,-1 )  # variation in response
         
         # eligibility criteria for trial
         y.0true <- rnorm(n, pop_mu, pop_sd)                  # true baseline
@@ -1042,6 +1067,89 @@ server <- shinyServer(function(input, output   ) {
       
     })
    
+    
+    
+    lmm <- reactive({
+      
+      sample <- random.sample()
+      
+      #trial <- make.data()$trial
+      d <- make.data()$d
+    #  f0 <- lm(y.1observed ~ y.0observed + treat, d)
+      
+      
+     require(nlme)
+    # LMM approach
+    m1 <- lme(delta.observed~ treat + y.0observed,
+              random=~1|treat , data=d, method="REML",
+              weights = varIdent(form = ~1 | treat))
+    
+    m0 <-lme(delta.observed~ treat + y.0observed,
+             random=~1|treat , data=d, method="REML")
+    
+    # print(m1)
+    m2 <- anova(m1,m0) # are the trt ctr interindividual variation in response different?
+    # 
+    # c.grp <- m1$sigma
+    # t.grp <- coef(m1$modelStruct$varStruct, uncons = FALSE)[[1]]*m1$sigma
+    # 
+    # # true individual response to the intervention estimate
+    # sqrt(t.grp^2 - c.grp^2) 
+    # 
+    # # truth
+    # sd(sample()$beta.treatment )
+    # 
+    return(list(m1=m1, m0=m0, m2=m2)) 
+    
+    })
+    
+    
+    output$reg.lmm0 <- renderPrint({
+      
+      return(lmm()$m0)
+      
+    })
+     
+    
+    output$reg.lmm1 <- renderPrint({
+      
+      return(lmm()$m1)
+      
+    })
+    
+    output$reg.lmm2 <- renderPrint({
+      
+      return(lmm()$m2)
+      
+    })
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
   output$A <- renderPrint({
       stats()$A
     }) 
