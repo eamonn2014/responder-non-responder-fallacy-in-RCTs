@@ -209,7 +209,7 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                                      
                                      
                                      p(strong("It can be seen that the response value of some patients seems to reduce markedly 
-                                     in response to the intervention, whereas for other patients it seems to remain unchanged or even increase at follow-up")),
+                                     in response to the intervention, whereas for other patients it seems to remain unchanged or increase at follow-up")),
                                      
                                      p(strong("In the simulation, the ‘true’ value for all treated patients
                                      changed by a constant value, indicated by the dashed horizontal line (determined by the 'treatment effect' slider).
@@ -217,7 +217,7 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                                      But in truth **EVERYBODY** responded to the drug **EQUALLY** ! ")),
                                 
                                      p(strong("It can also be seen that the response value of some patients seems to reduce markedly 
-                                     in the control arm, whereas for other patients it seems to remain unchanged or even increase at follow-up")),
+                                     in the control arm, whereas for other patients it seems to remain unchanged or increase at follow-up")),
                                              p(strong("The right panel is the control group. Observed responders in blue. 
                                               But in truth **NO ONE** responded. Apparent individual difference is due **ENTIRELY** to random within subject error,
                                               measurement error and regression to the mean. Slide the 'random noise' to zero to see.")),
