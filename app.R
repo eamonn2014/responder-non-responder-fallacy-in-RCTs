@@ -426,7 +426,7 @@ server <- shinyServer(function(input, output   ) {
         foo <- data.frame(foo, col1=NA, col2=NA)
         
         foo$col1 =   ifelse(foo$foo <    trt$beta.treatment, "blue" , "black")         
-        foo$col2 =   ifelse(foo$foo >    trt$beta.treatment, "blue" , "black")   
+        foo$col2 =   ifelse(foo$foo >=    trt$beta.treatment, "blue" , "black")   
         
         if (trt$beta.treatment <  0) {foo$colz = foo$col1} else {foo$colz = foo$col2}
       
@@ -449,7 +449,7 @@ server <- shinyServer(function(input, output   ) {
         foo <- data.frame(foo, col1=NA, col2=NA)
         
         foo$col1 =   ifelse(foo$foo <    trt$beta.treatment, "blue" , "black")         
-        foo$col2 =   ifelse(foo$foo >    trt$beta.treatment, "blue" , "black")   
+        foo$col2 =   ifelse(foo$foo >=    trt$beta.treatment, "blue" , "black")   
         
         if (trt$beta.treatment <  0) {foo$colz = foo$col1} else {foo$colz = foo$col2}
 
@@ -480,7 +480,6 @@ server <- shinyServer(function(input, output   ) {
       mi <-  min( diff)*1.2
       ma <-  max(diff)*1.2
       
-      
       stats <- stats()
       A=stats()$A
       AT=stats()$AT 
@@ -504,12 +503,11 @@ server <- shinyServer(function(input, output   ) {
       
       foo <- data.frame(foo, col1=NA, col2=NA)
       
-      foo$col1 =   ifelse(foo$foo <    sample$SENN, "blue" , "black")         
+      foo$col1 =   ifelse(foo$foo <=    sample$SENN, "blue" , "black")         
       foo$col2 =   ifelse(foo$foo >     sample$SENN, "blue" , "black")   
       
       if ( sample$SENN <  0) {foo$colz = foo$col1} else {foo$colz = foo$col2}
 
-      
       tex <- paste0("Treated patients \n N= ",AN,", No of responders= ",T.SENN," (",TC.SENN,"%), non responders=",AN-T.SENN," (",100-TC.SENN,"%)")
       
       plot(foo$foo, main=tex,
@@ -530,7 +528,7 @@ server <- shinyServer(function(input, output   ) {
       
       foo <- data.frame(foo, col1=NA, col2=NA)
       
-      foo$col1 =   ifelse(foo$foo <     sample$SENN, "blue" , "black")         
+      foo$col1 =   ifelse(foo$foo <=     sample$SENN, "blue" , "black")         
       foo$col2 =   ifelse(foo$foo >     sample$SENN, "blue" , "black")   
       
       if ( sample$SENN <  0) {foo$colz = foo$col1} else {foo$colz = foo$col2}
@@ -611,7 +609,7 @@ server <- shinyServer(function(input, output   ) {
         cr$conf.int[1:2]
         cr <- paste0( p2(cr$estimate),", 95%CI (",p2(cr$conf.int[1]),", " ,p2(cr$conf.int[2]), " )")
  
-        trt$col1 =   ifelse(trt$diff <  (sample$trt), "blue" , "black")         
+        trt$col1 =   ifelse(trt$diff <=  (sample$trt), "blue" , "black")         
         trt$col2 =   ifelse(trt$diff >  (sample$trt), "blue" , "black")           
     
         
@@ -643,7 +641,7 @@ server <- shinyServer(function(input, output   ) {
         cr$conf.int[1:2]
         cr <- paste0( p2(cr$estimate),", 95%CI (",p2(cr$conf.int[1]),", " ,p2(cr$conf.int[2]), " )")
   
-        ctr$col1 =   ifelse(ctr$diff <  (sample$trt), "blue" , "black")         
+        ctr$col1 =   ifelse(ctr$diff <=  (sample$trt), "blue" , "black")         
         ctr$col2 =   ifelse(ctr$diff >  (sample$trt), "blue" , "black")   
         
         with(ctr, plot(diff ~  y.0observed, 
@@ -701,7 +699,7 @@ server <- shinyServer(function(input, output   ) {
       
       foo <- data.frame(foo, col1=NA, col2=NA)
       
-      foo$col1 =   ifelse(foo$foo <    trt$beta.treatment, "blue" , "black")         
+      foo$col1 =   ifelse(foo$foo <=    trt$beta.treatment, "blue" , "black")         
       foo$col2 =   ifelse(foo$foo >    trt$beta.treatment, "blue" , "black")   
       
       if (trt$beta.treatment <  0) {foo$colz = foo$col1} else {foo$colz = foo$col2}
@@ -730,7 +728,7 @@ server <- shinyServer(function(input, output   ) {
       
       foo <- data.frame(foo, col1=NA, col2=NA)
       
-      foo$col1 =   ifelse(foo$foo <    trt$beta.treatment, "blue" , "black")         
+      foo$col1 =   ifelse(foo$foo <=    trt$beta.treatment, "blue" , "black")         
       foo$col2 =   ifelse(foo$foo >    trt$beta.treatment, "blue" , "black")   
       
       if (trt$beta.treatment <  0) {foo$colz = foo$col1} else {foo$colz = foo$col2}
@@ -773,7 +771,7 @@ server <- shinyServer(function(input, output   ) {
    
       with(trt, plot(diff ~  y.0observed,
                      
-                     col=  ifelse(beta.treatment <  0, trt$col1 , 
+                     col=  ifelse(beta.treatment <=  0, trt$col1 , 
                                   ifelse(beta.treatment >  0, trt$col2 ,    NA )) ,
                      
                      
@@ -803,8 +801,7 @@ server <- shinyServer(function(input, output   ) {
       
       with(ctr, plot(diff ~  y.0observed, 
                      
-                     # col=ifelse(diff <  sample$trt, 'blue', 'black'), 
-                     col=  ifelse(beta.treatment <  0, ctr$col1 , 
+                     col=  ifelse(beta.treatment <=  0, ctr$col1 , 
                                   ifelse(beta.treatment >  0, ctr$col2 ,    NA )) ,
 
                      pch=16
@@ -836,18 +833,17 @@ server <- shinyServer(function(input, output   ) {
           trt <- trial[trial$treat==1,]
           trt$diff <- trt$y.1observed - trt$y.0observed
           foo <- sort(trt[,"diff"])
-          A <- mean(foo < sample$trt)*length(foo)   # 
+          A <- mean(foo <= sample$trt)*length(foo)   # 
           AT <- round(A/length(foo)*100,1)
           AN <- length(foo)
           
           T.SENN <- mean(foo < sample$SENN)*length(foo)
           TC.SENN <- round(T.SENN/length(foo)*100,1)
           # ---------------------------------------------------------------------------
-          
           trt <- trial[trial$treat==0,]
           trt$diff <- trt$y.1observed - trt$y.0observed
           foo <- sort(trt[,"diff"])
-          C <- mean(foo < sample$trt)*length(foo)   # 
+          C <- mean(foo <= sample$trt)*length(foo)   # 
           CT <- round(C/length(foo)*100,1)
           CN = length(foo)
           
