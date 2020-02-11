@@ -26,18 +26,6 @@ pop=1e6
 # function to create longitudinal data  
 
 is.even <- function(x){ x %% 2 == 0 }
-
-# Individual response to treatment: is it a valid assumption senn
-# 1- pnorm((250-200)/sqrt(100^2+100^2))
-
-# To duplicate stephen senn's paper choose high power and low alpha. Individual response to treatment: is it a valid assumption? 
-# select treatment effect of -2.5
-# pop mean 0 (does not matter)
-# pop sd 4 (does not matter)
-# random noise =1
-# eligibilty =-5, drop this down so vast majority are included
-# clinically relvant difference -2
-
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ui <- fluidPage(theme = shinytheme("paper"), #https://www.rdocumentation.org/packages/shinythemes/versions/1.1.2
                 
@@ -160,9 +148,9 @@ ui <- fluidPage(theme = shinytheme("paper"), #https://www.rdocumentation.org/pac
                                         strong("eligibility, if patient is > this many SDs from population mean "),
                                         min=-5, max=5, step=1, value=-5, ticks=FALSE),
                    
-                          sliderInput("senn",
-                                      strong("Clinical relevant difference"),
-                                      min=-10, max=10, step=.1, value=-2, ticks=FALSE),
+                          # sliderInput("senn",
+                          #             strong("Clinical relevant difference"),
+                          #             min=-10, max=10, step=.1, value=-2, ticks=FALSE),
                             div(p( strong("References:"))),  
                             
                     
@@ -222,12 +210,12 @@ ui <- fluidPage(theme = shinytheme("paper"), #https://www.rdocumentation.org/pac
                                      h3(" "),
                                      
                                      p(strong("In the data simulation, the ‘true’ value for all treated patients
-                                     changed by a constant value, indicated by the dashed horizontal line.
+                                     changed by a constant value, indicated by the dashed horizontal line (determined by the 'treatment effect' slider).
                                      The left panel are the treated patients only, with observed 'responders' in blue.
-                                     But **EVERYBODY** responded to the drug **EQUALLY** ! 
+                                     But **EVERYBODY** responded to the drug **EQUALLY** ! ")),
                                 
-                                              The right panel is the control group. Observed responders in blue. 
-                                              But in truth **NO ONE** responded, apparent individual difference is due **ENTIRELY** to random within subject error,
+                                             p(strong("The right panel is the control group. Observed responders in blue. 
+                                              But in truth **NO ONE** responded. Apparent individual difference is due **ENTIRELY** to random within subject error,
                                               measurement error and regression to the mean. Slide the 'random noise' to zero to see.")),
                                      
                                    #  verbatimTextOutput("C"),
@@ -256,39 +244,43 @@ ui <- fluidPage(theme = shinytheme("paper"), #https://www.rdocumentation.org/pac
                                     #  h4("xxxxxxxxxxxxxxxxxx"),#
                                      #h6("xxxxxxxxxxxxxxxxxx."),
                                      div(plotOutput("res.plot4", width=fig.width2, height=fig.height2)), 
-                                    h5("Figure 3 All plots together. Top indivduals ordered by increasing observed response in treated (left) and control (right) arms. 
+                                    h5("Figure 3 All plots together. Top, indivduals ordered by increasing observed response in treated (left) and control (right) arms. 
                                         Bottom planels show observed response by baseline in treated (left) and control (right) arms. "),         
                             ) ,
                             #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                             tabPanel("ANCOVA model", value=6, 
-                                     h4("Modelling"),
-                                     p(strong("xxxxxxxxxxxxxxxxxxxxxx.")),
+                                    # h4("Modelling"),
+                                     p(strong("Here we estimate the treatment effect with a linear model.")),
                                    div( verbatimTextOutput("reg.summary2")),
-                                   p(strong("xxxxxxxxxxxxxxxxxxxxxx.")),
+                                   p(strong("95% CIs")),
                                    div( verbatimTextOutput("reg.summary3")),
                                 ) ,
                             
                             
                             tabPanel("Analyse the variance!", value=6, 
                                      #h4("Modelling"),
-                                     h5("Fisher in a letter on this topic in 1938 said to look at the variance in the outcome [3]. Let us analyze the variance.
+                                     p(strong("Fisher in a letter on this topic in 1938 said to look at the variance in the outcome [3]. 
                                         Is there any evidence against the null hypothesis that the variance in the outcome in the trial arms differ? 
-                                        The P-Value testing this hypothesis will the vast majority of the time provide evidence the SD for true interindividual variation 
-                                        is consistent in the trial arms, as it should, given that the true magnitude of response in the simulation is constant for all 
-                                        subjects randomised to the treated arm and constant in the control arm (zero). 
+                                        The P-Value testing this hypothesis will, the vast majority of the time, not reject the null hypothesis, 
+                                        as it should, given that the true magnitude of response in the simulation is constant for all 
+                                        patients randomised to the treated arm and constant in the control arm (zero). 
                                         This result provides information that any apparant response differences are negligible 
-                                        and any analysis of interindividual response is unwarranted."),
+                                        and any analysis of interindividual response is unwarranted.")),
                                       div( verbatimTextOutput("reg.lmm0")),
                                       div( verbatimTextOutput("reg.lmm1")),
                                      div( verbatimTextOutput("reg.lmm2")),
-                                     # p(strong("xxxxxxxxxxxxxxxxxxxxxx.")),
-                                     # div( verbatimTextOutput("reg.summary3")),
+                            
                             ) ,
                             
                             #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                             tabPanel("Clinically relevant difference", 
                                      div(plotOutput("reg.plotx", width=fig.width, height=fig.height)),  
-                                     
+                                     fluidRow(
+                                       column(12,
+                                              sliderInput("senn",
+                                                          strong("Clinical relevant difference"),
+                                                          min=-10, max=10, step=.1, value=-2, ticks=FALSE))
+                                     ),
                                      p(strong(" ")),
                                      p(strong("We duplicate Stephen Senn's example [2], but using a simulated dataset (one realisation). We can calulate 
                                               the proportion of treated who will fail to respond analytically by 1- pnorm((2.5-2)/sqrt(1^2+1^2))= 0.36, see left plot.
@@ -296,8 +288,8 @@ ui <- fluidPage(theme = shinytheme("paper"), #https://www.rdocumentation.org/pac
                                               to EVERYONE in the treated group. Blue circles denote the observed responders.")),
                                      
                                      p(strong("(To duplicate Stephen Senn's paper the default values selected are high power and low alpha.
-                                              Select treatment effect of -2.5, population mean and SD do not matter, set random noise to 1, and 
-                                              eligibilty to -5, drop this down so that the vast majority are included, finally set the clinically relvant difference to -2.)"
+                                              Select 'treatment effect' of -2.5, 'population mean' and 'population SD' do not matter, set 'random noise' to 1, and 
+                                              eligibilty to -5, drop this down so that the vast majority of patients are included, finally set the 'clinically relvant difference' on the above slider to -2.)"
                                                )),
                                   
                                      
@@ -350,20 +342,7 @@ server <- shinyServer(function(input, output   ) {
         return(list( n=n ,  trt=trt , mu=mu, sd=sd, noise=noise, eligible=eligible, power=power, alpha=alpha, SENN =SENN )) 
         
     })
-    # ---------------------------------------------------------------------------
-    # --------------------------------------------------------------------------
-    # ---------------------------------------------------------------------------
-    # n <- 10000
-    # power <- .9
-    # alpha <- .05
-    # beta.treatment <-     -2
-    # pop_mu <-     7
-    # pop_sd <-     5
-    # 
-    # noise <-  3
-    # ur.eligible <- 0
-
-    # 
+  
     # --------------------------------------------------------------------------
     # ---------------------------------------------------------------------------
     # ---------------------------------------------------------------------------
@@ -489,11 +468,7 @@ server <- shinyServer(function(input, output   ) {
         
         if (trt$beta.treatment <  0) {foo$colz = foo$col1} else {foo$colz = foo$col2}
       
-        
-        
-        # Z <- data.frame(AN=AN, A=A, AT=AT, CN=CN, C=C, CT= CT)
-        # names(Z) <- c("N trt","Observed responders trt",  "%" , "N ctrl","Observed responders ctrl" , "%")
-        
+ 
         
         tex <- paste0("Treated patients \n N= ",AN,", No of responders= ",A," (",AT,"%)")
         
@@ -503,20 +478,7 @@ server <- shinyServer(function(input, output   ) {
              col=  foo$colz)
         grid(nx = NULL, ny = NULL, col = "lightgray", lty = "dotted")
         
-        
-      
-          # 
-          # 
-          # 
-          # plot(foo, main=tex,
-          #      ylab= "follow up - baseline", xlab="Individual subjects order by observed response", 
-          #      xlim=c(0,1.05*N/2), ylim=c(mi,ma), #length(trt[,"diff"])
-          #      col=  ifelse(beta.treatment <  0, col1 , 
-          #                   ifelse(beta.treatment >  0, col2 ,    NA ) ))
-          #  
-         
-         
-     
+
         
         
         
@@ -538,11 +500,7 @@ server <- shinyServer(function(input, output   ) {
         foo$col2 =   ifelse(foo$foo >    trt$beta.treatment, "blue" , "black")   
         
         if (trt$beta.treatment <  0) {foo$colz = foo$col1} else {foo$colz = foo$col2}
-        
-        # tex <- "Individual changes in response in treated arm
-        #    Suggested individual differences due entirely to regression to the mean
-        #    and random error (within subject and measurement error)"
-        
+
         tex <- paste0("Control patients \n N= ",CN,", No of responders= ",C," (",CT,"%)")
         
         plot(foo$foo, main=tex,
@@ -553,9 +511,7 @@ server <- shinyServer(function(input, output   ) {
         
         abline(h=0)
         abline(h=input$trt, lty=2)
-        # this many were not observed to have red uced response by more than 5
-        # wrongly labelled as 'non responders'
-         mean(foo > input$trt)*length(foo)   # shown in red
+
         
         par(mfrow=c(1,1))
         # ---------------------------------------------------------------------------
@@ -602,12 +558,7 @@ server <- shinyServer(function(input, output   ) {
       foo$col2 =   ifelse(foo$foo >     sample$SENN, "blue" , "black")   
       
       if ( sample$SENN <  0) {foo$colz = foo$col1} else {foo$colz = foo$col2}
-      
-      
-      
-      # Z <- data.frame(AN=AN, A=A, AT=AT, CN=CN, C=C, CT= CT)
-      # names(Z) <- c("N trt","Observed responders trt",  "%" , "N ctrl","Observed responders ctrl" , "%")
-      
+
       
       tex <- paste0("Treated patients \n N= ",AN,", No of responders= ",T.SENN," (",TC.SENN,"%), non responders=",AN-T.SENN," (",100-TC.SENN,"%)")
       
@@ -616,20 +567,7 @@ server <- shinyServer(function(input, output   ) {
            xlim=c(0, xup), ylim=c(mi,ma), #length(trt[,"diff"])
            col=  foo$colz)
       grid(nx = NULL, ny = NULL, col = "lightgray", lty = "dotted")
-      
-      
-      
-      # 
-      # 
-      # 
-      # plot(foo, main=tex,
-      #      ylab= "follow up - baseline", xlab="Individual subjects order by observed response", 
-      #      xlim=c(0,1.05*N/2), ylim=c(mi,ma), #length(trt[,"diff"])
-      #      col=  ifelse(beta.treatment <  0, col1 , 
-      #                   ifelse(beta.treatment >  0, col2 ,    NA ) ))
-      #  
-      
-      
+ 
       
       
       
@@ -637,9 +575,7 @@ server <- shinyServer(function(input, output   ) {
       abline(h=0)
       abline(h=input$trt, lty=2)
       abline(h=input$senn, lty=2, col="blue")
-      # this many were not observed to have reduced response by more than 5
-      # wrongly labelled as 'non responders'
-    #  mean(foo > input$trt)*length(foo)   # shown in red
+
       
       # ---------------------------------------------------------------------------
       
@@ -654,10 +590,7 @@ server <- shinyServer(function(input, output   ) {
       
       if ( sample$SENN <  0) {foo$colz = foo$col1} else {foo$colz = foo$col2}
       
-      # tex <- "Individual changes in response in treated arm
-      #    Suggested individual differences due entirely to regression to the mean
-      #    and random error (within subject and measurement error)"
-      
+     
       tex <- paste0("Control patients \n N= ",CN,", No of responders= ",C.SENN," (",CT.SENN,"%), non responders=",CN-C.SENN," (",100-CT.SENN,"%)")
       
       plot(foo$foo, main=tex,
@@ -669,9 +602,7 @@ server <- shinyServer(function(input, output   ) {
       abline(h=0)
       abline(h=input$trt, lty=2)
       abline(h=input$senn, lty=2, col="blue")
-      # this many were not observed to have red uced response by more than 5
-      # wrongly labelled as 'non responders'
-     # mean(foo > input$trt)*length(foo)   # shown in red
+ 
       
       par(mfrow=c(1,1))
       # ---------------------------------------------------------------------------
@@ -725,19 +656,10 @@ server <- shinyServer(function(input, output   ) {
                      
                      , cex.main =1.25,
                        ylim=c(mi,ma), xlim=c(mix,max) ))
-     
-        # 
-        # with(trt, abline(lm(diff ~  y.0observed)))
-        # with(trt, abline(h=mean(beta.treatment), lty=2))
-        # with(trt, abline(h=0, col="red" ))
-        
-        
-        
+
         with(trt, abline(lm(diff ~  y.0observed), col=c("red"), lty=c(1), lwd=c(2) ) )
         with(trt, abline(h=mean(beta.treatment), col=c("forestgreen"), lty="dashed", lwd=c(2) ) )
-        #with(trt, abline(h=0, col="black" , lty=1)) 
-        # abline(h=0)
-        # 
+        
         grid(nx = NULL, ny = NULL, col = "lightgray", lty = "dotted")
         abline(h=0, lwd=c(1))
             #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -765,9 +687,7 @@ server <- shinyServer(function(input, output   ) {
     
         
         with(ctr, abline(lm(diff ~  y.0observed), col=c("red"), lty=c(1), lwd=c(2) ) )
-       # with(ctr, abline(h=mean(beta.treatment), col=c("forestgreen"), lty="dashed", lwd=c(1) ) )
-      #  with(ctr, abline(h=0, col="black" , lty=4)) 
-        
+    
         grid(nx = NULL, ny = NULL, col = "lightgray", lty = "dotted")
         abline(h=0, lwd=c(1))
         with(ctr, abline(h=(beta.treatment), col=c("forestgreen"), lty="dashed",  lwd=c(2) ))
@@ -826,22 +746,7 @@ server <- shinyServer(function(input, output   ) {
            xlim=c(0, xup), ylim=c(mi,ma), #length(trt[,"diff"])
            col=  foo$colz)
       
-      # 
-      # 
-      # plot(foo, main="Treated arm",
-      #      ylab= "follow up - baseline", xlab="Individual subjects order by observed response", 
-      #      xlim=c(0,1.05*N/2), ylim=c(mi,ma), #length(trt[,"diff"])
-      #      col=ifelse(foo > input$trt, 'black', 'blue') ) #, asp=4)
-     # abline(h=0, lty=2)
-     # abline(h=input$trt)
-    #  with(trt, abline(h=mean(beta.treatment), col=c("forestgreen"), lty=c(1), lwd=c(1) ) )
-   #   with(trt, abline(h=0, col="black", lty="dashed")) 
-      #with(trt, abline(v=A, col="black", lty="dashed"))
-      # this many were not observed to have reduced response by more than 5
-      # wrongly labelled as 'non responders'
-    #  grid(nx = NULL, ny = NULL, col = "lightgray", lty = "dotted")
-      
-      
+     
       grid(nx = NULL, ny = NULL, col = "lightgray", lty = "dotted")
       with(trt, abline(v=A, col="black", lty="dashed"))
       with(trt, abline(h=0, col="black", lty=1))
@@ -919,19 +824,7 @@ server <- shinyServer(function(input, output   ) {
                      
                      cex.main =1.25,
                      ylim=c(mi,ma), xlim=c(mix,max) ))
-      
-      
-      # par(mfrow=c(2,2))
-      # with(trt, plot(diff ~  y.0observed, col=ifelse(diff < sample$trt, 'blue', 'black'), pch=16
-      #                , xlab="observed baseline",  ylab="follow up - baseline"  ,
-      #                main="Treatment arm: Individual changes against baseline, observed responders in blue", cex.main =1,
-      #                ylim=c(mi,ma), xlim=c(mix,max) ))
-      # with(trt, abline(lm(diff ~  y.0observed), col=c("red"), lty=c(2), lwd=c(2) ) )
-      # with(trt, abline(h=mean(beta.treatment), col=c("forestgreen"), lty=c(1), lwd=c(1) ) )
-      # with(trt, abline(h=0, col="black", lty="dashed")) 
-      # grid(nx = NULL, ny = NULL, col = "lightgray", lty = "dotted")
-      
-      
+ 
       grid(nx = NULL, ny = NULL, col = "lightgray", lty = "dotted")
       with(trt, abline(h=0, col="black", lty=1))
       with(trt, abline(lm(diff ~  y.0observed), col=c("red"), lty=c(1), lwd=c(1) ) )
@@ -949,17 +842,7 @@ server <- shinyServer(function(input, output   ) {
       cr$conf.int[1:2]
       cr <- paste0( p2(cr$estimate),", 95%CI (",p2(cr$conf.int[1]),", " ,p2(cr$conf.int[2]), " )")
      
-      # par(bg = 'blue')
-      # with(ctr, plot(diff ~  y.0observed, col=ifelse(diff <  sample$trt, 'blue', 'black'), pch=16
-      #                , xlab="observed baseline",  ylab="follow up - baseline"  ,
-      #                main="Control arm:  Individual changes against baseline, observed responders in blue", cex.main =1,
-      #                ylim=c(mi,ma), xlim=c(mix,max) ))
-      # with(ctr, abline(lm(diff ~  y.0observed), col=c("red"), lty=c(2), lwd=c(2) ) )
-      # with(ctr, abline(h=mean(beta.treatment), col=c("forestgreen"), lty=c(1), lwd=c(1) ) )
-      # with(ctr, abline(h=0, col="black", lty="dashed"))
-      
-      
-      ctr$col1 =   ifelse(ctr$diff <  (sample$trt), "blue" , "black")         
+        ctr$col1 =   ifelse(ctr$diff <  (sample$trt), "blue" , "black")         
       ctr$col2 =   ifelse(ctr$diff >  (sample$trt), "blue" , "black")   
       
       with(ctr, plot(diff ~  y.0observed, 
@@ -974,11 +857,7 @@ server <- shinyServer(function(input, output   ) {
                      
                      main=paste0("Treatment arm: observed responders in blue\nPearson's correlation ",cr),
                      
-                     
-                     # main="Treatment arm: Individual changes against baseline, observed responders in blue", 
-                     
-                     cex.main =1.25,
-                     #main="Control arm:  Individual changes against baseline, observed responders in blue", cex.main =1,
+       cex.main =1.25,
                      ylim=c(mi,ma), xlim=c(mix,max) ))
     
       
@@ -1073,10 +952,8 @@ server <- shinyServer(function(input, output   ) {
       
       sample <- random.sample()
       
-      #trial <- make.data()$trial
       d <- make.data()$d
-    #  f0 <- lm(y.1observed ~ y.0observed + treat, d)
-      
+
       
      require(nlme)
     # LMM approach
@@ -1123,31 +1000,7 @@ server <- shinyServer(function(input, output   ) {
       
     })
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+   
     
     
   output$A <- renderPrint({
@@ -1173,10 +1026,7 @@ server <- shinyServer(function(input, output   ) {
 
       foo<- stats()$Z
 
-      #namez <- c("true baseline","observed baseline","eligible","treatment group","true treatment effect\n in treated only","
-          #        true response","observed response","delta observed")
-     # names(foo) <- namez
-      rownames(foo) <- NULL
+       rownames(foo) <- NULL
       library(DT)
 
       datatable(foo,
