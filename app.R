@@ -1,38 +1,38 @@
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Rshiny ideas from on https://gallery.shinyapps.io/multi_regression/
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-library(ggplot2)
-library(shiny) 
-library(nlme)
-library(VCA)
-library(MASS)
-require(tidyverse)
-require(ggplot2)
-library(shinyWidgets)
+  library(ggplot2)
+  library(shiny) 
+  library(nlme)
+  library(VCA)
+  library(MASS)
+  require(tidyverse)
+  require(ggplot2)
+  library(shinyWidgets)
+  library(shinythemes)  # more funky looking apps
+  
+  options(max.print=1000000)
+  fig.width <- 1375
+  fig.height <- 550
+  fig.width2 <- 1375  
+  fig.height2 <- 730
 
-options(max.print=1000000)
-fig.width <- 1375
-fig.height <- 550
-
-fig.width2 <- 1375 #1200
-fig.height2 <- 730
-library(shinythemes)        # more funky looking apps
-p1 <- function(x) {formatC(x, format="f", digits=1)}
-p2 <- function(x) {formatC(x, format="f", digits=2)}
-options(width=100)
-set.seed(12345) #reproducible
-
-pop=1e6
-# function to create longitudinal data  
-
-is.even <- function(x){ x %% 2 == 0 }
+  p1 <- function(x) {formatC(x, format="f", digits=1)}
+  p2 <- function(x) {formatC(x, format="f", digits=2)}
+  options(width=100)
+  set.seed(12345) # reproducible
+  
+  pop=1e6 # this is the population size we take sample from
+  is.even <- function(x){ x %% 2 == 0 } # function to id. odd maybe useful
+  # Always remember that the purpose of a parallel-group randomized trial is to compare the parallel groups, 
+  # NOT to look at change from baseline.  Baseline should always be an adjustment covariate (only).
+  
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/packages/shinythemes/versions/1.1.2
                 
-                #paper
-    
+                # paper
 
-                       setBackgroundColor(
+                setBackgroundColor(
                   color = c( "#2171B5", "#F7FBFF"),
                   gradient = "linear",
                   direction = "bottom"
@@ -40,9 +40,8 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
 
             
                 
-                h2("Responders, non responders fallacy in parallel RCTs"),
-                
-    
+                h2("Responder, non responder fallacy in parallel RCTs"),
+
                 h4("  We perform a simulation of a randomised control trial demonstrating one reason why it is wrong to analyse arms 
                 of a trial separately aiming to identify responders and non responders. 'The essential feature of a randomised trial is the comparison between groups. Within group analyses do
                 not address a meaningful question: the question is not whether there
@@ -51,35 +50,21 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                 
                 h3("  "), 
                # shinyUI(pageWithSidebar(
-            
-                    
               #     titlePanel("Hello Shiny!"),
                    
                    
                    
                    sidebarLayout(
                     
-                     
-                     
-                     
-                     
-                    sidebarPanel( width=3 ,
+                   sidebarPanel( width=3 ,
                       
-                    
                      tags$style(type="text/css", ".span8 .well { background-color: #00FFFF; }"),
                       
                       #wellPanel(style = "background: #2171B5",),
-                      
-                      
+                   
                         tags$style(".well {background-color:#b6aebd ;}"), ##ABB0B4AF
                        
-                      
-      
-                      
-                      
-                      
-                        #div(p("
-                        h4("
+                         h4("
                         The first slider sets the power and the next alpha level, so we can power the trial as we wish. The next slider is the 'Treatment effect'. 
                         All patients in the treatment arm are given this effect. So a constant treatment effect is given to ALL in the treated group.
                         Similarly, NO ONE in the control group receives any treatment effect. The next two sliders are the 'Population mean' and 'Population SD', 
@@ -87,13 +72,6 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                         person variation. The 'Random noise' slider is a term representing the within person variation and measurement variation. 
                         The next slider imposes if desired
                         an inclusion criteria based on the response distribution."),
-                        
-                        
-                        
-                        
-                        
-                        
-                     #")),
                         
                         div(
                             
@@ -112,8 +90,6 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                             br(), br(),
                             
                             #div(strong("Select the parameters using the sliders below"),p(" ")),
-                            
-                
                            # div((" ")),
                             #br(),
 
@@ -152,10 +128,7 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                           #             strong("Clinical relevant difference"),
                           #             min=-10, max=10, step=.1, value=-2, ticks=FALSE),
                             div(h5("References:")),  
-                            
-                    
-                     
-                          
+
                             tags$a(href = "https://www.bmj.com/content/bmj/342/bmj.d561.full.pdf", "[1] Comparisons within randomised groups can be very misleading"),
                             div(p(" ")),
                             tags$a(href = "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC524113/pdf/bmj32900966.pdf", "[2] Individual response to treatment: is it a valid assumption?"),
@@ -170,25 +143,15 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                           div(p(" ")),
                         )
                           
-                      
-                      #Always remember that the purpose of a parallel-group randomized trial is to compare the parallel groups, NOT to look at change from baseline.  Baseline should always be an adjustment covariate (only).
-                      
-                      
-                    ),
+                   ),
                     
                     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~tab panels
                     mainPanel(width=9,
-                   
-               
+
                         #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                         #    tabsetPanel(type = "tabs", 
                         navbarPage(       
                             #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  
-                
-                            
-      
-                            
-                            
                             tags$style(HTML("
                             .navbar-default .navbar-brand {color: orange;}
                             .navbar-default .navbar-brand:hover {color: blue;}
@@ -211,7 +174,6 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                                      
                                      h3(" "),
                                      
-                                     
                                      p(strong("It can be seen that the response value of some patients seems to vary at follow-up. 
                                      The same can be said for the patients in the control arm, the response value of some patients seems to reduce  
                                      whereas for other patients it seems to changed by a small amount or increase at follow-up.")),
@@ -224,13 +186,7 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                                      p(strong("The right panel depicts the control group. Observed responders are shown in blue. But in truth **NO ONE** responded. Apparent individual difference is due **ENTIRELY** to random within subject error,
                                               measurement error and regression to the mean. Slide the 'Random noise' to zero to see.")),
                                      
-                                   #  verbatimTextOutput("C"),
-                                     
-                                   #  DT::dataTableOutput("tablex"),
-                                     
-                                  # div( verbatimTextOutput("xx")),
-                                 #    p(strong("Total sample size:")),
-                                #        
+                                
                             ) ,
                             #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                             tabPanel("Plot individual change against baseline",
@@ -309,8 +265,6 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                             ) ,
                             #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                             tabPanel("Data", value=3, 
-                                     #  h4("Data listing"),
-                                     #h6("A list of the data"),
                                      DT::dataTableOutput("table1"),
                                      
                             ) 
@@ -321,9 +275,7 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                     
                ) #
                     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~end tab panels 
-                    
-             #   )
-             #   )
+
 )
 
 server <- shinyServer(function(input, output   ) {
@@ -347,8 +299,6 @@ server <- shinyServer(function(input, output   ) {
         noise <-  input$noise     
         eligible <- input$eligible  
         SENN <- input$senn
-        
-        
         
         return(list( n=n ,  trt=trt , mu=mu, sd=sd, noise=noise, eligible=eligible, power=power, alpha=alpha, SENN =SENN )) 
         
@@ -479,8 +429,6 @@ server <- shinyServer(function(input, output   ) {
         
         if (trt$beta.treatment <  0) {foo$colz = foo$col1} else {foo$colz = foo$col2}
       
- 
-        
         tex <- paste0("Treated patients \n N= ",AN,", No of responders= ",A," (",AT,"%)")
         
         plot(foo$foo, main=tex,
@@ -488,17 +436,9 @@ server <- shinyServer(function(input, output   ) {
              xlim=c(0, xup), ylim=c(mi,ma), #length(trt[,"diff"])
              col=  foo$colz)
         grid(nx = NULL, ny = NULL, col = "lightgray", lty = "dotted")
-        
-
-        
-        
-        
         abline(h=0)
         abline(h=input$trt, lty=2)
-        # this many were not observed to have reduced response by more than 5
-        # wrongly labelled as 'non responders'
-        mean(foo > input$trt)*length(foo)   # shown in red
-        
+
         # ---------------------------------------------------------------------------
         
         trt <- trial[trial$treat==0,]
@@ -522,10 +462,8 @@ server <- shinyServer(function(input, output   ) {
         
         abline(h=0)
         abline(h=input$trt, lty=2)
-
-        
         par(mfrow=c(1,1))
-        # ---------------------------------------------------------------------------
+     # ---------------------------------------------------------------------------
     })
     
     
@@ -578,16 +516,11 @@ server <- shinyServer(function(input, output   ) {
            xlim=c(0, xup), ylim=c(mi,ma), #length(trt[,"diff"])
            col=  foo$colz)
       grid(nx = NULL, ny = NULL, col = "lightgray", lty = "dotted")
- 
-      
-      
-      
-      
+     
       abline(h=0)
       abline(h=input$trt, lty=2)
       abline(h=input$senn, lty=2, col="blue")
 
-      
       # ---------------------------------------------------------------------------
       
       trt <- trial[trial$treat==0,]
@@ -600,8 +533,7 @@ server <- shinyServer(function(input, output   ) {
       foo$col2 =   ifelse(foo$foo >     sample$SENN, "blue" , "black")   
       
       if ( sample$SENN <  0) {foo$colz = foo$col1} else {foo$colz = foo$col2}
-      
-     
+
       tex <- paste0("Control patients \n N= ",CN,", No of responders= ",C.SENN," (",CT.SENN,"%), non responders=",CN-C.SENN," (",100-CT.SENN,"%)")
       
       plot(foo$foo, main=tex,
@@ -618,15 +550,13 @@ server <- shinyServer(function(input, output   ) {
       par(mfrow=c(1,1))
       # ---------------------------------------------------------------------------
     })
-    
-    
-    
-    senn2 <- reactive({
+
+  senn2 <- reactive({
       
       sample <- random.sample()
       
-      noise <-  sample$noise        # 
-      beta.treatment <-  sample$trt #  
+      noise <-  sample$noise        
+      beta.treatment <-  sample$trt   
       senn <- input$senn
       
       res <- 1- pnorm( (beta.treatment-senn)/ sqrt(noise^2+noise^2)    )
@@ -641,34 +571,14 @@ server <- shinyServer(function(input, output   ) {
       
     })
     
-    
     output$senn.est2 <- renderPrint({
       
       return(senn2()$res2)
       
     })
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   
     # ---------------------------------------------------------------------------    
     output$res.plot  <- renderPlot({       
         
@@ -759,9 +669,7 @@ server <- shinyServer(function(input, output   ) {
     output$res.plot4 <- renderPlot({       
       
       sample <- random.sample()
-      
-    
-      
+
       trial <- make.data()$trial
       
       N <- make.data()$N
@@ -805,8 +713,7 @@ server <- shinyServer(function(input, output   ) {
            ylab= "follow up - baseline", xlab="Individual subjects order by observed response", 
            xlim=c(0, xup), ylim=c(mi,ma), #length(trt[,"diff"])
            col=  foo$colz)
-      
-     
+
       grid(nx = NULL, ny = NULL, col = "lightgray", lty = "dotted")
       with(trt, abline(v=A, col="black", lty="dashed"))
       with(trt, abline(h=0, col="black", lty=1))
@@ -836,13 +743,10 @@ server <- shinyServer(function(input, output   ) {
            xlim=c(0, xup), ylim=c(mi,ma), #length(trt[,"diff"])
            col=  foo$colz)
       
-
       grid(nx = NULL, ny = NULL, col = "lightgray", lty = "dotted")
       with(trt, abline(v=C, col="black", lty="dashed"))
       with(trt, abline(h=0, col="black", lty=1))
       with(trt, abline(h=(beta.treatment), col=c("forestgreen"), lty=c(2), lwd=c(1) ) )
-
-    
       #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       trial <- make.data()$trial
       
@@ -865,9 +769,7 @@ server <- shinyServer(function(input, output   ) {
       
       trt$col1 =   ifelse(trt$diff <  (sample$trt), "blue" , "black")         
       trt$col2 =   ifelse(trt$diff >  (sample$trt), "blue" , "black")           
-      
-      
-    # par(mfrow=c(2,2))
+   
       with(trt, plot(diff ~  y.0observed,
                      
                      col=  ifelse(beta.treatment <  0, trt$col1 , 
@@ -878,9 +780,6 @@ server <- shinyServer(function(input, output   ) {
                      , xlab="observed baseline",  ylab="follow up - baseline"  ,
                      
                      main=paste0("Treatment arm: observed responders in blue\nPearson's correlation ",cr),
-                     
-                     
-                    # main="Treatment arm: Individual changes against baseline, observed responders in blue", 
                      
                      cex.main =1.25,
                      ylim=c(mi,ma), xlim=c(mix,max) ))
@@ -893,10 +792,6 @@ server <- shinyServer(function(input, output   ) {
       
       ctr <- trial[trial$treat==0,]
       ctr$diff <- ctr$y.1observed - ctr$y.0observed
-      
-     # with(trt, cor.test( diff,   y.0observed, method="pearson"))
-      
-      
       cr <- with(ctr, cor.test( diff,   y.0observed, method="pearson"))
       cr$estimate[1][[1]]
       cr$conf.int[1:2]
@@ -910,35 +805,25 @@ server <- shinyServer(function(input, output   ) {
                      # col=ifelse(diff <  sample$trt, 'blue', 'black'), 
                      col=  ifelse(beta.treatment <  0, ctr$col1 , 
                                   ifelse(beta.treatment >  0, ctr$col2 ,    NA )) ,
-                     
-                     
+
                      pch=16
                      , xlab="observed baseline",  ylab="follow up - baseline"  ,
                      
                      main=paste0("Treatment arm: observed responders in blue\nPearson's correlation ",cr),
                      
-       cex.main =1.25,
-                     ylim=c(mi,ma), xlim=c(mix,max) ))
+                     cex.main =1.25,
+                    ylim=c(mi,ma), xlim=c(mix,max) ))
     
-      
-        
        grid(nx = NULL, ny = NULL, col = "lightgray", lty = "dotted")
        with(ctr, abline(h=0, col="black", lty=1))
        with(ctr, abline(lm(diff ~  y.0observed), col=c("red"), lty=c(1), lwd=c(1) ) )
        with(ctr, abline(h=(beta.treatment), col=c("forestgreen"), lty=c(2), lwd=c(1) ) )
-       
-       
       #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       par(mfrow=c(1,1))
       
-      
-       
-      
     })
     
-    
-    
-    stats <- reactive({
+   stats <- reactive({
       
       sample <- random.sample()
       
@@ -970,7 +855,6 @@ server <- shinyServer(function(input, output   ) {
       
       } else { 
         
-        
           N <- nrow(trial)
           trt <- trial[trial$treat==1,]
           trt$diff <- trt$y.1observed - trt$y.0observed
@@ -978,7 +862,6 @@ server <- shinyServer(function(input, output   ) {
           A <- mean(foo > sample$trt)*length(foo)   # 
           AT <- round(A/length(foo)*100,1)
           AN <- length(foo)
-          
           
           T.SENN <- mean(foo < sample$SENN)*length(foo)
           TC.SENN <- round(T.SENN/length(foo)*100,1)
@@ -997,12 +880,12 @@ server <- shinyServer(function(input, output   ) {
       }
       
       
-      
       Z <- data.frame(AN=AN, A=A, AT=AT, CN=CN, C=C, CT= CT)
       names(Z) <- c("N trt","Observed responders trt",  "%" , "N ctrl","Observed responders ctrl" , "%")
-      rownames(Z) <- NULL 
+      rownames(Z) <- NULL
       # ---------------------------------------------------------------------------
-      return(list(A=A, AT=AT, C=C, CT= CT, Z=Z, AN=AN, CN=CN, T.SENN=T.SENN, TC.SENN=TC.SENN, C.SENN=C.SENN , CT.SENN=CT.SENN)) 
+      return(list(A=A, AT=AT, C=C, CT= CT, Z=Z, AN=AN, CN=CN, T.SENN=T.SENN, TC.SENN=TC.SENN, 
+                  C.SENN=C.SENN , CT.SENN=CT.SENN)) 
       
     })
    
@@ -1014,7 +897,6 @@ server <- shinyServer(function(input, output   ) {
       
       d <- make.data()$d
 
-      
      require(nlme)
     # LMM approach
     m1 <- lme(delta.observed~ treat + y.0observed,
@@ -1059,11 +941,8 @@ server <- shinyServer(function(input, output   ) {
       return(lmm()$m2)
       
     })
-    
-   
-    
-    
-  output$A <- renderPrint({
+     
+   output$A <- renderPrint({
       stats()$A
     }) 
     
@@ -1071,14 +950,12 @@ server <- shinyServer(function(input, output   ) {
       stats()$C
     }) 
     
-    
-    
+     
     output$xx <- renderPrint({ 
       
       m  <- stats()$Z
       
           return(m )
-      
     })
     
     
