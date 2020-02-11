@@ -174,16 +174,17 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                                      
                                      h3(" "),
                                      
-                                     p(strong("It can be seen that the response value of some patients seems to vary at follow-up. 
-                                     The same can be said for the patients in the control arm, the response value of some patients seems to reduce  
-                                     whereas for other patients it seems to change by a small amount or increase at follow-up.")),
+                                     p(strong("It can be seen that the response value of some treated patients seems to vary at follow-up. 
+                                     The same can be said for the patients in the control arm, the response value of some control patients seems to reduce  
+                                     whereas for others it seems to change by a small amount or increase at follow-up.")),
                                      
                                      p(strong("In the simulation, the ‘true’ value for all treated patients
-                                     changed by a constant value, indicated by the dashed horizontal line (determined by the 'Treatment effect' slider).
-                                     The left panel depicts the treated patients only, with observed 'responders' in blue.
-                                     But in truth **EVERYBODY** responded to the drug **EQUALLY**!")),
-                                
-                                     p(strong("The right panel depicts the control group. Observed responders are shown in blue. But in truth **NO ONE** responded. Apparent individual difference is due **ENTIRELY** to random within subject error,
+                                     changed by a constant value, indicated by the dashed horizontal line (and determined by the 'Treatment effect' slider).
+                                     The left panel depicts treated patients only, with observed 'responders' in blue. In truth **EVERYBODY** 
+                                     in the treated arm responded to the drug **EQUALLY**! The right panel depicts the control group. Observed responders 
+                                     are shown in blue. But in truth **NO ONE** in the control arm responded.")),
+                                     
+                                     p(strong("Apparent individual difference is due **ENTIRELY** to random within subject error,
                                               measurement error and regression to the mean. Slide the 'Random noise' to zero to see.")),
                                      
                                 
@@ -242,15 +243,15 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                                                           strong("Clinical relevant difference"),
                                                           min=-10, max=10, step=.1, value=-2, ticks=FALSE))
                                      ),
-                                     h4("Figure 4 Observed individual changes plotted against baseline, treated (left) and control (right) arms incorporating a clinical relevant difference. "),         
+                                     h4("Figure 4 Observed individual changes plotted against baseline, treated (left) and control (right) arms incorporating a clinical relevant difference."),         
                                      
                                      p(strong(" ")),
-                                     p(strong("We duplicate Stephen Senn's example [2], but using a simulated dataset (one realisation). We can calculate 
-                                              the proportion of treated who will fail to respond analytically by pnorm((-2.5--2)/sqrt(1^2+1^2))= 0.36, see left plot.
+                                     p(strong("We replicate Stephen Senn's example [2], but using a simulated dataset (one realisation). We can calculate analytically using R
+                                              the proportion of treated who will fail to respond by pnorm((-2.5--2)/sqrt(1^2+1^2))= 0.36, see left plot.
                                               The blue dashed line defines the clinical relevant difference. The black dashed line the constant treatment effect applied 
                                               to EVERYONE in the treated group. Blue circles denote the observed responders.")),
                                      
-                                     p(strong("(To duplicate Stephen Senn's paper the default values selected are high power and low alpha.
+                                     p(strong("(To replicate Stephen Senn's paper the default values selected are high power and low alpha.
                                               Select 'treatment effect' of -2.5, 'population mean' and 'population SD' do not matter, set 'random noise' to 1, and 
                                               eligibilty to -5, drop this down so that the vast majority of patients are included, finally set the 'Clinical relevant difference' on the above slider to -2.)"
                                                )),
