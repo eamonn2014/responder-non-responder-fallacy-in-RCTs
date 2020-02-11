@@ -212,7 +212,7 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                                      h3(" "),
                                      
                                      
-                                     p(strong("It can be seen that the response value of some patients seems vary at follow-up. 
+                                     p(strong("It can be seen that the response value of some patients seems to vary at follow-up. 
                                      The same can be said for the patients in the control arm, the response value of some patients seems to reduce  
                                      whereas for other patients it seems to changed by a small amount or increase at follow-up.")),
                                      
