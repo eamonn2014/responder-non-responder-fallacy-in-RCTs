@@ -278,7 +278,7 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                             ) ,
                             
                             #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                            tabPanel("Clinically relevant difference", 
+                            tabPanel("Clinical relevant difference", 
                                      div(plotOutput("reg.plotx", width=fig.width, height=fig.height)),  
                                      fluidRow(
                                        column(12,
@@ -291,12 +291,12 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                                      p(strong(" ")),
                                      p(strong("We duplicate Stephen Senn's example [2], but using a simulated dataset (one realisation). We can calculate 
                                               the proportion of treated who will fail to respond analytically by pnorm((-2.5--2)/sqrt(1^2+1^2))= 0.36, see left plot.
-                                              The blue dashed line defines the clinically relevant difference. The black dashed line the constant treatment effect applied 
+                                              The blue dashed line defines the clinical relevant difference. The black dashed line the constant treatment effect applied 
                                               to EVERYONE in the treated group. Blue circles denote the observed responders.")),
                                      
                                      p(strong("(To duplicate Stephen Senn's paper the default values selected are high power and low alpha.
                                               Select 'treatment effect' of -2.5, 'population mean' and 'population SD' do not matter, set 'random noise' to 1, and 
-                                              eligibilty to -5, drop this down so that the vast majority of patients are included, finally set the 'clinically relevant difference' on the above slider to -2.)"
+                                              eligibilty to -5, drop this down so that the vast majority of patients are included, finally set the 'Clinical relevant difference' on the above slider to -2.)"
                                                )),
                                   
                                      
