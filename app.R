@@ -214,7 +214,7 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                                      whereas for other patients it seems to changed by a small amount or increase at follow-up.")),
                                      
                                      p(strong("In the simulation, the ‘true’ value for all treated patients
-                                     changed by a constant value, indicated by the dashed horizontal line (determined by the 'treatment effect' slider).
+                                     changed by a constant value, indicated by the dashed horizontal line (determined by the 'Treatment effect' slider).
                                      The left panel depicts the treated patients only, with observed 'responders' in blue.
                                      But in truth **EVERYBODY** responded to the drug **EQUALLY**!")),
                                 
