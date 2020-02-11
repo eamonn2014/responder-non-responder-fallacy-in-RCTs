@@ -20,7 +20,7 @@ library(shinythemes)        # more funky looking apps
 p1 <- function(x) {formatC(x, format="f", digits=1)}
 p2 <- function(x) {formatC(x, format="f", digits=2)}
 options(width=100)
-#set.seed(12345) #reproducible
+set.seed(12345) #reproducible
 
 pop=1e6
 # function to create longitudinal data  
@@ -377,7 +377,7 @@ server <- shinyServer(function(input, output   ) {
                                  type="two.sample", alternative=c("two.sided"))$n*2)
         
        # beta.treatment <- runif(n,-4,-1 )  # variation in response  
-        
+        #beta.treatment <- sample(-1:-4,n,replace=TRUE )
         # eligibility criteria for trial
         y.0true <- rnorm(n, pop_mu, pop_sd)                  # true baseline
         y.0observed <- y.0true + rnorm(n, 0, 1*noise)        # observed baseline 
