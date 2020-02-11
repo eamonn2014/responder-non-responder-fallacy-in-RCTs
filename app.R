@@ -171,7 +171,7 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                         )
                           
                       
-                      
+                      #Always remember that the purpose of a parallel-group randomized trial is to compare the parallel groups, NOT to look at change from baseline.  Baseline should always be an adjustment covariate (only).
                       
                       
                     ),
@@ -296,7 +296,7 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                                      
                                      p(strong("(To duplicate Stephen Senn's paper the default values selected are high power and low alpha.
                                               Select 'treatment effect' of -2.5, 'population mean' and 'population SD' do not matter, set 'random noise' to 1, and 
-                                              eligibilty to -5, drop this down so that the vast majority of patients are included, finally set the 'clinically relvant difference' on the above slider to -2.)"
+                                              eligibilty to -5, drop this down so that the vast majority of patients are included, finally set the 'clinically relevant difference' on the above slider to -2.)"
                                                )),
                                   
                                      
