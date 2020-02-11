@@ -386,7 +386,7 @@ server <- shinyServer(function(input, output   ) {
                                  sig.level= alpha, power= power,
                                  type="two.sample", alternative=c("two.sided"))$n*2)
         
-       # beta.treatment <- runif(n,-4,-1 )  # variation in response
+       # beta.treatment <- runif(n,-4,-1 )  # variation in response  
         
         # eligibility criteria for trial
         y.0true <- rnorm(n, pop_mu, pop_sd)                  # true baseline
