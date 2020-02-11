@@ -105,7 +105,7 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                           
                           
                             actionButton(inputId='ab1', label="R code",   icon = icon("th"), 
-                                         onclick ="window.open('https://raw.githubusercontent.com/eamonn2014/biochemistry-and-haematology/master/heam_biochem/app.R', '_blank')"),   
+                                         onclick ="window.open('https://raw.githubusercontent.com/eamonn2014/responder-non-responder-fallacy-in-RCTs/master/app.R', '_blank')"),   
                             actionButton("resample", "Simulate a new sample"),
                             br(), br(),
                             
@@ -116,7 +116,7 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                             #br(),
 
                             sliderInput("power", 
-                                        h5("pPower"),
+                                        h5("Power"),
                                         min=.80, max=.99, step=.01, value=.99, 
                                         ticks=FALSE),
                             
@@ -264,8 +264,8 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                             tabPanel("Analyse the variance!", value=6, 
                                                           h4("Fisher in a letter on this topic in 1938 said to look at the variance in the outcome [3]. 
                                         Is there any evidence against the null hypothesis that the variance in the outcome in the trial arms differ? 
-                                        The P-Value testing this hypothesis will, the vast majority of the time, not reject the null hypothesis, 
-                                        as it should, given that the true magnitude of response in the simulation is constant for all 
+                                        The P-Value testing this hypothesis will for the vast majority of the time not reject the null hypothesis.  
+                                        This is what we expect, given that the true magnitude of response in the simulation is constant for all 
                                         patients randomised to the treated arm and constant in the control arm (zero). 
                                         This result provides information that any apparant response differences are negligible 
                                         and any analysis of interindividual response is unwarranted."),
@@ -287,8 +287,8 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                                      h4("Figure 4 Observed individual changes plotted against baseline, treated (left) and control (right) arms incorporating a clinical relevant difference. "),         
                                      
                                      p(strong(" ")),
-                                     p(strong("We duplicate Stephen Senn's example [2], but using a simulated dataset (one realisation). We can calulate 
-                                              the proportion of treated who will fail to respond analytically by 1- pnorm((2.5-2)/sqrt(1^2+1^2))= 0.36, see left plot.
+                                     p(strong("We duplicate Stephen Senn's example [2], but using a simulated dataset (one realisation). We can calculate 
+                                              the proportion of treated who will fail to respond analytically by pnorm((-2.5--2)/sqrt(1^2+1^2))= 0.36, see left plot.
                                               The blue dashed line defines the clinically relevant differnece. The black dashed line the constant treatment effect applied 
                                               to EVERYONE in the treated group. Blue circles denote the observed responders.")),
                                      
@@ -298,7 +298,11 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                                                )),
                                   
                                      
-                                     
+                                     h4("Analytcal calculation of proportion who will appear to show a
+                                     clinically relevant difference in the trial in the treated patients"),
+                                     div( verbatimTextOutput("senn.est")),
+                                     h4("And in the control patients"),
+                                     div( verbatimTextOutput("senn.est2"))
                                      
                             ) ,
                             #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -614,6 +618,55 @@ server <- shinyServer(function(input, output   ) {
     })
     
     
+    
+    senn2 <- reactive({
+      
+      sample <- random.sample()
+      
+      noise <-  sample$noise        # 
+      beta.treatment <-  sample$trt #  
+      senn <- input$senn
+      
+      res <- 1- pnorm( (beta.treatment-senn)/ sqrt(noise^2+noise^2)    )
+      res2 <- 1-pnorm( (0-senn)/ sqrt(noise^2+noise^2)    )
+      return(list(res=res , res2=res2))
+    })     
+    
+    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    output$senn.est <- renderPrint({
+      
+      return(senn2()$res)
+      
+    })
+    
+    
+    output$senn.est2 <- renderPrint({
+      
+      return(senn2()$res2)
+      
+    })
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     # ---------------------------------------------------------------------------    
     output$res.plot  <- renderPlot({       
         
@@ -725,7 +778,7 @@ server <- shinyServer(function(input, output   ) {
       
       # ---------------------------------------------------------------------------
       par(mfrow=c(2,2))
-      par(bg = 'ivory')
+     # par(bg = 'ivory')
       
       xup <-  max(table(trial$treat))  # new
       trt <- trial[trial$treat==1,]
