@@ -27,9 +27,9 @@ pop=1e6
 
 is.even <- function(x){ x %% 2 == 0 }
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-ui <- fluidPage(theme = shinytheme("paper"), #https://www.rdocumentation.org/packages/shinythemes/versions/1.1.2
+ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/packages/shinythemes/versions/1.1.2
                 
-       
+                #paper
     
 
                        setBackgroundColor(
@@ -40,16 +40,16 @@ ui <- fluidPage(theme = shinytheme("paper"), #https://www.rdocumentation.org/pac
 
             
                 
-                h3("Responders non responders fallacy...even if treatment effect is truly constant, some patients are observed to respond....random effects model"),
+                h2("Responders, non responders fallacy in parallel RCTs"),
                 
     
-                h4("'The essential feature of a randomised trial is the comparison between groups. Within group analyses do
+                h4("  We perform a simulation of a randomised control trial demonstrating one reason why it is wrong to analyse arms 
+                of a trial separately aiming to identify responders and non responders. 'The essential feature of a randomised trial is the comparison between groups. Within group analyses do
                 not address a meaningful question: the question is not whether there
                 is a change from baseline, but whether any change is greater in one group than the other [1].'
-                We perform a simulation of a randomised control trial demonstrating one reason why it is wrong to analyse arms 
-                of a trial separately aiming to identify responders and non responders."), 
+              "), 
                 
-                
+                h3("  "), 
                # shinyUI(pageWithSidebar(
             
                     
@@ -78,19 +78,20 @@ ui <- fluidPage(theme = shinytheme("paper"), #https://www.rdocumentation.org/pac
                       
                       
                       
-                        div(p("
-                        The first slider sets the power and the next alpha level, so we can power the trial as we wish. The next slider again is the treatment effect. 
+                        #div(p("
+                        h4("
+                        The first slider sets the power and the next alpha level, so we can power the trial as we wish. The next slider is the 'Treatment effect'. 
                         All patients in the treatment arm are given this effect. So a constant treatment is given to ALL in the treated group.
-                        Similarly NO ONE in the control group receives any treatment effect. The next two sliders are the population mean and sd, this sd is the between 
-                        person variation. The random noise slide is a term representing the within person variation and measurement variation. The next slide imposes if desired
-                        an inclusion criteria based on the response value.
+                        Similarly NO ONE in the control group receives any treatment effect. The next two sliders are the 'Population mean' and 'Population sd', this sd is the between 
+                        person variation. The 'Random noise' slider is a term representing the within person variation and measurement variation. The next slider imposes if desired
+                        an inclusion criteria based on the response distribution."),
                         
                         
                         
                         
                         
                         
-                     ")),
+                     #")),
                         
                         div(
                             
@@ -108,50 +109,47 @@ ui <- fluidPage(theme = shinytheme("paper"), #https://www.rdocumentation.org/pac
                             actionButton("resample", "Simulate a new sample"),
                             br(), br(),
                             
-                            div(strong("Select the parameters using the sliders below"),p(" ")),
+                            #div(strong("Select the parameters using the sliders below"),p(" ")),
                             
-                            
-                    
-                            
-                            
+                
                            # div((" ")),
                             #br(),
 
                             sliderInput("power", 
-                                        strong("Power"),
+                                        h5("pPower"),
                                         min=.80, max=.99, step=.01, value=.99, 
                                         ticks=FALSE),
                             
                             sliderInput("alpha", 
-                                        strong("alpha"),
+                                        h5("Alpha"),
                                         min=.01, max=.2, step=.01, value=.01, 
                                         ticks=FALSE),
 
                             sliderInput("trt",
-                                        strong("treatment effect"),
+                                        h5("Treatment effect"),
                                         min=-10, max=10, step=.1, value=-2.5, ticks=FALSE),
                             
                             sliderInput("pop_mu",
-                                        strong("population mean"),
+                                        h5("Population mean"),
                                         min=-10, max=10, step=1, value=10, ticks=FALSE),
                             
                             sliderInput("pop_sd",
-                                        strong("population sd"),
+                                        h5("Population sd"),
                                         min=1, max=10, step=1, value=8, ticks=FALSE),
                             
                             sliderInput("noise",
-                                        strong("random noise"),
+                                        h5("Random noise"),
                                         min=0, max=4, step=.2, value=1, ticks=FALSE),
                             
                             
                             sliderInput("eligible",
-                                        strong("eligibility, if patient is > this many SDs from population mean "),
+                                        h5("Eligible, if patient is > this many SDs from population mean "),
                                         min=-5, max=5, step=1, value=-5, ticks=FALSE),
                    
                           # sliderInput("senn",
                           #             strong("Clinical relevant difference"),
                           #             min=-10, max=10, step=.1, value=-2, ticks=FALSE),
-                            div(p( strong("References:"))),  
+                            div(h5("References:")),  
                             
                     
                      
@@ -202,18 +200,24 @@ ui <- fluidPage(theme = shinytheme("paper"), #https://www.rdocumentation.org/pac
 
                    ")),
                             #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~end of section to add colour     
-                            tabPanel("Plot observed change in order of magnitude", 
+                            tabPanel("Plot change in order of magnitude", 
                                      #    h2("Plotting the data"),
                                      div(plotOutput("reg.plot3", width=fig.width, height=fig.height)),  
-                                     h5("Figure 1 Observed change in each patient in order of magnitude, blue observed 'responders'. Treated (left) and control arm (right)."),
+                                     h4("Figure 1 Observed change in each patient in order of magnitude, blue observed 'responders'. Treated (left) and control arm (right)."),
                                      
                                      h3(" "),
                                      
-                                     p(strong("In the data simulation, the ‘true’ value for all treated patients
+                                     
+                                     p(strong("It can be seen that the response value of some patients seems to reduce markedly 
+                                     in response to the intervention, whereas for other patients it seems to remain unchanged or even increase at follow-up")),
+                                     
+                                     p(strong("In the simulation, the ‘true’ value for all treated patients
                                      changed by a constant value, indicated by the dashed horizontal line (determined by the 'treatment effect' slider).
                                      The left panel are the treated patients only, with observed 'responders' in blue.
                                      But in truth **EVERYBODY** responded to the drug **EQUALLY** ! ")),
                                 
+                                     p(strong("It can also be seen that the response value of some patients seems to reduce markedly 
+                                     in the control arm, whereas for other patients it seems to remain unchanged or even increase at follow-up")),
                                              p(strong("The right panel is the control group. Observed responders in blue. 
                                               But in truth **NO ONE** responded. Apparent individual difference is due **ENTIRELY** to random within subject error,
                                               measurement error and regression to the mean. Slide the 'random noise' to zero to see.")),
@@ -227,10 +231,10 @@ ui <- fluidPage(theme = shinytheme("paper"), #https://www.rdocumentation.org/pac
                                 #        
                             ) ,
                             #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                            tabPanel("Plot observed individual change against baseline",
+                            tabPanel("Plot individual change against baseline",
                                      #h4("Fxxxxxxxxxxxxxxxxxxxxxxxxxxxx"),
                                      div(plotOutput("res.plot", width=fig.width, height=fig.height)),  
-                                     h5("Figure 2 Observed individual changes plotted against baseline, treated (left) and control (right) arms. "),         
+                                     h4("Figure 2 Observed individual changes plotted against baseline, treated (left) and control (right) arms. "),         
                                      
                                      
                                      p(strong("The negative slope so often seen in this type of plot can be due entirely to regression to the mean and mathematical coupling. Participants with a relatively high measured value
@@ -244,13 +248,13 @@ ui <- fluidPage(theme = shinytheme("paper"), #https://www.rdocumentation.org/pac
                                     #  h4("xxxxxxxxxxxxxxxxxx"),#
                                      #h6("xxxxxxxxxxxxxxxxxx."),
                                      div(plotOutput("res.plot4", width=fig.width2, height=fig.height2)), 
-                                    h5("Figure 3 All plots together. Top, indivduals ordered by increasing observed response in treated (left) and control (right) arms. 
+                                    h4("Figure 3 All plots together. Top, indivduals ordered by increasing observed response in treated (left) and control (right) arms. 
                                         Bottom planels show observed response by baseline in treated (left) and control (right) arms. "),         
                             ) ,
                             #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                             tabPanel("ANCOVA model", value=6, 
                                     # h4("Modelling"),
-                                     p(strong("Here we estimate the treatment effect with a linear model.")),
+                                     h4("Here we estimate the treatment effect with a linear model."),
                                    div( verbatimTextOutput("reg.summary2")),
                                    p(strong("95% CIs")),
                                    div( verbatimTextOutput("reg.summary3")),
@@ -258,14 +262,13 @@ ui <- fluidPage(theme = shinytheme("paper"), #https://www.rdocumentation.org/pac
                             
                             
                             tabPanel("Analyse the variance!", value=6, 
-                                     #h4("Modelling"),
-                                     p(strong("Fisher in a letter on this topic in 1938 said to look at the variance in the outcome [3]. 
+                                                          h4("Fisher in a letter on this topic in 1938 said to look at the variance in the outcome [3]. 
                                         Is there any evidence against the null hypothesis that the variance in the outcome in the trial arms differ? 
                                         The P-Value testing this hypothesis will, the vast majority of the time, not reject the null hypothesis, 
                                         as it should, given that the true magnitude of response in the simulation is constant for all 
                                         patients randomised to the treated arm and constant in the control arm (zero). 
                                         This result provides information that any apparant response differences are negligible 
-                                        and any analysis of interindividual response is unwarranted.")),
+                                        and any analysis of interindividual response is unwarranted."),
                                       div( verbatimTextOutput("reg.lmm0")),
                                       div( verbatimTextOutput("reg.lmm1")),
                                      div( verbatimTextOutput("reg.lmm2")),
@@ -281,6 +284,8 @@ ui <- fluidPage(theme = shinytheme("paper"), #https://www.rdocumentation.org/pac
                                                           strong("Clinical relevant difference"),
                                                           min=-10, max=10, step=.1, value=-2, ticks=FALSE))
                                      ),
+                                     h4("Figure 4 Observed individual changes plotted against baseline, treated (left) and control (right) arms incorporating a clinical relevant difference. "),         
+                                     
                                      p(strong(" ")),
                                      p(strong("We duplicate Stephen Senn's example [2], but using a simulated dataset (one realisation). We can calulate 
                                               the proportion of treated who will fail to respond analytically by 1- pnorm((2.5-2)/sqrt(1^2+1^2))= 0.36, see left plot.
@@ -297,9 +302,9 @@ ui <- fluidPage(theme = shinytheme("paper"), #https://www.rdocumentation.org/pac
                                      
                             ) ,
                             #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                            tabPanel("Data listing", value=3, 
+                            tabPanel("Data", value=3, 
                                      #  h4("Data listing"),
-                                     h6("xxxxxxxxxxxxxxxxxxxxxxxxxxx"),
+                                     #h6("A list of the data"),
                                      DT::dataTableOutput("table1"),
                                      
                             ) 
