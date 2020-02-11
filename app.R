@@ -81,9 +81,11 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                         #div(p("
                         h4("
                         The first slider sets the power and the next alpha level, so we can power the trial as we wish. The next slider is the 'Treatment effect'. 
-                        All patients in the treatment arm are given this effect. So a constant treatment is given to ALL in the treated group.
-                        Similarly NO ONE in the control group receives any treatment effect. The next two sliders are the 'Population mean' and 'Population sd', this sd is the between 
-                        person variation. The 'Random noise' slider is a term representing the within person variation and measurement variation. The next slider imposes if desired
+                        All patients in the treatment arm are given this effect. So a constant treatment effect is given to ALL in the treated group.
+                        Similarly, NO ONE in the control group receives any treatment effect. The next two sliders are the 'Population mean' and 'Population SD', 
+                        this standard deviation is the between 
+                        person variation. The 'Random noise' slider is a term representing the within person variation and measurement variation. 
+                        The next slider imposes if desired
                         an inclusion criteria based on the response distribution."),
                         
                         
