@@ -289,7 +289,7 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                                      p(strong(" ")),
                                      p(strong("We duplicate Stephen Senn's example [2], but using a simulated dataset (one realisation). We can calculate 
                                               the proportion of treated who will fail to respond analytically by pnorm((-2.5--2)/sqrt(1^2+1^2))= 0.36, see left plot.
-                                              The blue dashed line defines the clinically relevant differnece. The black dashed line the constant treatment effect applied 
+                                              The blue dashed line defines the clinically relevant difference. The black dashed line the constant treatment effect applied 
                                               to EVERYONE in the treated group. Blue circles denote the observed responders.")),
                                      
                                      p(strong("(To duplicate Stephen Senn's paper the default values selected are high power and low alpha.
