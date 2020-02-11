@@ -162,8 +162,8 @@ ui <- fluidPage(theme = shinytheme("paper"), #https://www.rdocumentation.org/pac
                             div(p(" ")),
                             tags$a(href = "https://www.youtube.com/watch?v=uiCd9m6tmt0&feature=youtu.be", "[3] Professor George Davey Smith - Some constraints on the scope and potential of personalised medicine"),
                             div(p(" ")),
-                            # tags$a(href = "https://en.wikipedia.org/wiki/Statistical_process_control", "[4] Statistical process control"),
-                            # div(p(" ")),
+                             tags$a(href = "https://physoc.onlinelibrary.wiley.com/doi/epdf/10.1113/EP085070", "[4] True and false interindividual differencesin the physiological response to an intervention"),
+                             div(p(" ")),
                             # tags$a(href = "https://twitter.com/f2harrell/status/1220700181496320001", "[5] Purpose of RCT"),
                             # div(p(" ")),
                         )
@@ -212,7 +212,7 @@ ui <- fluidPage(theme = shinytheme("paper"), #https://www.rdocumentation.org/pac
                                      p(strong("In the data simulation, the ‘true’ value for all treated patients
                                      changed by a constant value, indicated by the dashed horizontal line (determined by the 'treatment effect' slider).
                                      The left panel are the treated patients only, with observed 'responders' in blue.
-                                     But **EVERYBODY** responded to the drug **EQUALLY** ! ")),
+                                     But in truth **EVERYBODY** responded to the drug **EQUALLY** ! ")),
                                 
                                              p(strong("The right panel is the control group. Observed responders in blue. 
                                               But in truth **NO ONE** responded. Apparent individual difference is due **ENTIRELY** to random within subject error,
