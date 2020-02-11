@@ -176,7 +176,7 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                                      
                                      p(strong("It can be seen that the response value of some patients seems to vary at follow-up. 
                                      The same can be said for the patients in the control arm, the response value of some patients seems to reduce  
-                                     whereas for other patients it seems to changed by a small amount or increase at follow-up.")),
+                                     whereas for other patients it seems to change by a small amount or increase at follow-up.")),
                                      
                                      p(strong("In the simulation, the ‘true’ value for all treated patients
                                      changed by a constant value, indicated by the dashed horizontal line (determined by the 'Treatment effect' slider).
