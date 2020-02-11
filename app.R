@@ -257,7 +257,7 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                                                )),
                                   
                                      
-                                     h4("Analytcal calculation of proportion who will appear to show a
+                                     h4("Analytical calculation of proportion who will appear to show a
                                      clinically relevant difference in the trial in the treated patients"),
                                      div( verbatimTextOutput("senn.est")),
                                      h4("And in the control patients"),
