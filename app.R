@@ -237,8 +237,8 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                                      h4("Figure 2 Observed individual changes plotted against baseline, treated (left) and control (right) arms. "),         
                                      
                                      
-                                     p(strong("The negative slope so often seen in this type of plot can be due entirely to regression to the mean and mathematical coupling. Participants with a relatively high measured value
-                                     at baseline will naturally regress towards the mean so that follow-up measurements are lower, and vice versa for participants with a relatively low value
+                                     p(strong("The negative slope often seen in this type of plot can be due entirely to regression to the mean. Patients with a relatively high measured value
+                                     at baseline will naturally regress towards the mean so that follow-up measurements are lower, and vice versa for patients with a relatively low value
                                   at baseline. This regression to the mean leads to the artefact of a negative correlation between change and initial value (or any other variable that is correlated with the initial value).
                                               ")),
                             ),
