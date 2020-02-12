@@ -247,7 +247,7 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                                      
                                      p(strong(" ")),
                                      p(strong("We replicate Stephen Senn's example [2], but using a simulated dataset (one realisation). We can calculate analytically using R
-                                              the proportion of treated who will fail to respond by pnorm((-2.5--2)/sqrt(1^2+1^2))= 0.36, see left plot.
+                                              the proportion of treated who will fail to respond by pnorm((-2.5--2)/sqrt(1^2+1^2))= 0.36, see left plot using settings below.
                                               The blue dashed line defines the clinical relevant difference. The black dashed line the constant treatment effect applied 
                                               to EVERYONE in the treated group. Blue circles denote the observed responders.")),
                                      
@@ -405,12 +405,15 @@ server <- shinyServer(function(input, output   ) {
         
         
         stats <- stats()
+        
          A=stats()$A
          AT=stats()$AT 
          C=stats()$C    
+         
          CT=stats()$CT
          AN=stats()$AN
          CN=stats()$CN
+         
          T.SENN =stats()$T.SENN
          C.SENN =stats()$C.SENN
         # ---------------------------------------------------------------------------
@@ -506,9 +509,12 @@ server <- shinyServer(function(input, output   ) {
       foo$col1 =   ifelse(foo$foo <=    sample$SENN, "blue" , "black")         
       foo$col2 =   ifelse(foo$foo >     sample$SENN, "blue" , "black")   
       
-      if ( sample$SENN <  0) {foo$colz = foo$col1} else {foo$colz = foo$col2}
-
+      if ( sample$SENN <  0) {foo$colz = foo$col1
       tex <- paste0("Treated patients \n N= ",AN,", No of responders= ",T.SENN," (",TC.SENN,"%), non responders=",AN-T.SENN," (",100-TC.SENN,"%)")
+      } else {
+        foo$colz = foo$col2
+      tex <- paste0("Treated patients \n N= ",AN,", No of responders= ",AN-T.SENN," (",100-TC.SENN,"%), non responders=",AN-T.SENN," (",TC.SENN,"%)")
+      }
       
       plot(foo$foo, main=tex,
            ylab= "follow up - baseline", xlab="Individual subjects ordered by observed response", 
@@ -531,9 +537,14 @@ server <- shinyServer(function(input, output   ) {
       foo$col1 =   ifelse(foo$foo <=     sample$SENN, "blue" , "black")         
       foo$col2 =   ifelse(foo$foo >     sample$SENN, "blue" , "black")   
       
-      if ( sample$SENN <  0) {foo$colz = foo$col1} else {foo$colz = foo$col2}
-
+      if ( sample$SENN <  0) {foo$colz = foo$col1
       tex <- paste0("Control patients \n N= ",CN,", No of responders= ",C.SENN," (",CT.SENN,"%), non responders=",CN-C.SENN," (",100-CT.SENN,"%)")
+      } else {
+        foo$colz = foo$col2
+      tex <- paste0("Control patients \n N= ",CN,", No of responders= ",CN-C.SENN," (",100-CT.SENN,"%), non responders=",CN-C.SENN," (",CT.SENN,"%)") 
+      }
+      
+      
       
       plot(foo$foo, main=tex,
            ylab= "follow up - baseline", xlab="Individual subjects ordered by observed response", 
