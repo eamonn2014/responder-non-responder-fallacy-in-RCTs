@@ -256,10 +256,20 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                                         patients randomised to the treated arm and constant in the control arm (zero). 
                                         This result provides information that any apparent response differences are negligible 
                                         and any analysis of interindividual response is unwarranted."),
+                                     
+                                     fluidRow(
+                                       column(width = 5,
                                       div( verbatimTextOutput("reg.lmm0")),
                                       div( verbatimTextOutput("reg.lmm1")),
-                                     div( verbatimTextOutput("reg.lmm2")),
-                            
+                                    # div( verbatimTextOutput("reg.lmm2")),
+                                       ),
+                                     
+                                     fluidRow(
+                                       column(width = 5,
+                                             # div( verbatimTextOutput("reg.lmm0")),
+                                             # div( verbatimTextOutput("reg.lmm1")),
+                                              div( verbatimTextOutput("reg.lmm2")),
+                                       ))),
                             ) ,
                             
                             #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
