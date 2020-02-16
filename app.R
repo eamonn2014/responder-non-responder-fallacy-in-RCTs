@@ -196,7 +196,7 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                                        column(width = 5,
                                               div(plotOutput("ancova.plot", width=fig.width3, height=fig.height3))
                                        )),
-                                     h4("Figure 1 ANCOVA model estimating the treatment effect 'treat' whilst adjusting for baseline version of outcome, right panel is a plot of treatment effect; distance between parallel lines"),
+                                     h4("Figure 1 ANCOVA model estimating the treatment effect 'treat' whilst adjusting for baseline version of outcome, right panel is a plot of estimated treatment effect, represented by the distance between the parallel lines"),
                             ) ,
                             #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~end of section to add colour     
                             tabPanel("Plot change in order of magnitude", 
