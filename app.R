@@ -68,9 +68,10 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                         
                          The first slider is the 'Treatment effect', every patient in the treatment arm 
                         experiences this effect. So a constant treatment effect is given to ALL in the treated group.
-                        Conversely , NO ONE in the control group receives the treatment effect. The next two sliders are the 'Population mean' and 'Population SD', 
+                        Conversely , NO ONE in the control group receives the treatment effect. The 'Random noise' slider is a term representing the within person variation and measurement variation. 
+                        The next two sliders are the 'Population mean' and 'Population SD', 
                         this standard deviation is the between 
-                        person variation. The 'Random noise' slider is a term representing the within person variation and measurement variation. 
+                        person variation.
                         The next slider imposes, if desired,
                         an inclusion criteria based on the response distribution. All scenarios have 99% power with alpha 1% to pick up the treatment effect."),
                      
@@ -82,7 +83,7 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                      
                      
                      
-                     h4("The first tab 'ANOVA' presents the appropriate approach to assessing if there is evidence of non constant treatment effect.
+                     h4("The first tab 'ANOVA' presents the appropriate approach to estimating the treatment effect for this study design.
                         The next tab presents the observed treatment effect for each patient ordered by magnitude, for each trial arm. There is a typical shape to the distibution,
                         few patients have large changes, most small changes. 
                         The third tab shows the treatment effect by baseline values. Typically we see a negative correlation. 
