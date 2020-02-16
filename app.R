@@ -184,7 +184,7 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                                        column(width = 5,
                                               div(plotOutput("ancova.plot", width=fig.width3, height=fig.height3))
                                        )),
-                                     h4("Figure 1 ANCOVA model estimating the treatment effect 'treat' whilst adjusting for baseline version of outcome, right panel is a plot of estimated treatment effect, represented by the distance between the parallel lines"),
+                                     h4("Figure 1 ANCOVA model estimating the treatment effect 'treat' whilst adjusting for baseline version of outcome, right panel is a plot of estimated treatment effect, represented by the average vertical distance between the lines. Note the regression lines are from ggplot and not based on the ancova model."),
                             ) ,
                             #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~end of section to add colour     
                             tabPanel("2 Plot change in order of magnitude", 
@@ -905,11 +905,12 @@ server <- shinyServer(function(input, output   ) {
       foo$col1 =   ifelse(foo$foo <=    input$senn, "blue" , "black")
       foo$col2 =   ifelse(foo$foo >     input$senn, "blue" , "black")
 
-      if ( input$senn <  0) {foo$colz = foo$col1
+      if ( input$senn <  0) {
+        foo$colz = foo$col1
       tex <- paste0("Treated patients \n N= ",AN,", No of responders= ",T.SENN," (",TC.SENN,"%), non responders=",AN-T.SENN," (",100-TC.SENN,"%)")
       } else {
         foo$colz = foo$col2
-      tex <- paste0("Treated patients \n N= ",AN,", No of responders= ",AN-T.SENN," (",100-TC.SENN,"%), non responders=",AN-T.SENN," (",TC.SENN,"%)")
+      tex <- paste0("Treated patients \n N= ",AN,", No of responders= ",AN-T.SENN," (",100-TC.SENN,"%), non responders=",T.SENN," (",TC.SENN,"%)")
       }
       par(mfrow=c(1,2))
       plot(foo$foo, main=tex,
@@ -940,7 +941,7 @@ server <- shinyServer(function(input, output   ) {
       tex <- paste0("Control patients \n N= ",CN,", No of responders= ",C.SENN," (",CT.SENN,"%), non responders=",CN-C.SENN," (",100-CT.SENN,"%)")
       } else {
         foo$colz = foo$col2
-      tex <- paste0("Control patients \n N= ",CN,", No of responders= ",CN-C.SENN," (",100-CT.SENN,"%), non responders=",CN-C.SENN," (",CT.SENN,"%)")
+      tex <- paste0("Control patients \n N= ",CN,", No of responders= ",CN-C.SENN," (",100-CT.SENN,"%), non responders=",C.SENN," (",CT.SENN,"%)")
       }
 
       plot(foo$foo, main=tex,
