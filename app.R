@@ -16,7 +16,8 @@
   fig.height <- 550
   fig.width2 <- 1375  
   fig.height2 <- 730
-
+  fig.width3 <- 800  
+  fig.height3 <- 545
   p1 <- function(x) {formatC(x, format="f", digits=1)}
   p2 <- function(x) {formatC(x, format="f", digits=2)}
   options(width=100)
@@ -81,13 +82,13 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                      
                      
                      
-                     h4("
-                        The first tab present the observed treatment effect for each patient ordered by magnitude, for each trial arm. There is a typical shape to the distibution,
-                        few patients have 
-                        large changes, most small changes. The next tab shows the treatment effect by baseline values. Typically we see a negative correlation. The third tab presents all previous 
-                        plots together. The fourth tab is the correct analysis of the trial adjusting for the baseline version of the outcome measure. The fifth tab presents the 
-                        appropriate approach to assessing if there is evidence of non constant treatment effect. The sixth tab reproduces via simulation a Stephen Senn's example [2].
-                        Lastly, a listing of the data is presented on the final tab."),
+                     h4("The first tab 'ANOVA' presents the appropriate approach to assessing if there is evidence of non constant treatment effect.
+                        The next tab present the observed treatment effect for each patient ordered by magnitude, for each trial arm. There is a typical shape to the distibution,
+                        few patients have large changes, most small changes. 
+                        The third tab shows the treatment effect by baseline values. Typically we see a negative correlation. 
+                        The forth tab presents all previous plots from the previous two tabs together. 
+                        The fifth tab reproduces via simulation a Stephen Senn example [2].
+                        Lastly, a listing of the data is presented."),
                         div(
                             
                           tags$head(
@@ -180,11 +181,27 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                             .navbar-default .navbar-nav > li > a[data-value='t3'] {color: green;background-color: lightgreen;}
 
                    ")),
+                            
+                            tabPanel("ANCOVA", value=6, 
+                                     # h4("Modelling"),
+                                     h4("First we show the preferred approach, estimate the treatment effect with a linear model."),
+                                     
+                                     fluidRow(
+                                       column(width = 5,
+                                              div( verbatimTextOutput("reg.summary2")),
+                                              p(strong("95% CIs")),
+                                              div( verbatimTextOutput("reg.summary3"))
+                                       ), 
+                                       column(width = 5,
+                                              div(plotOutput("ancova.plot", width=fig.width3, height=fig.height3))
+                                       )),
+                                     h4("Figure 1 ANCOVA model estimating the treatment effect 'treat' whilst adjusting for baseline version of outcome, right panel is a plot of treatment effect; distance between parallel lines"),
+                            ) ,
                             #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~end of section to add colour     
                             tabPanel("Plot change in order of magnitude", 
                                      #    h2("Plotting the data"),
                                      div(plotOutput("reg.plot1", width=fig.width, height=fig.height)),  
-                                     h4("Figure 1 Observed change in each patient in order of magnitude, blue observed 'responders'. Treated (left) and control arm (right)."),
+                                     h4("Figure 2 Observed change in each patient in order of magnitude, blue observed 'responders'. Treated (left) and control arm (right)."),
                                      
                                      h3(" "),
                                      
@@ -208,7 +225,7 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                             tabPanel("Plot individual change against baseline",
                                      #h4("Fxxxxxxxxxxxxxxxxxxxxxxxxxxxx"),
                                      div(plotOutput("res.plot2", width=fig.width, height=fig.height)),  
-                                     h4("Figure 2 Observed individual changes plotted against baseline, treated (left) and control (right) arms."),         
+                                     h4("Figure 3 Observed individual changes plotted against baseline, treated (left) and control (right) arms."),         
                                      
                                      
                                      p(strong("The negative slope often seen in this type of plot can be due entirely to regression to the mean. Patients with a relatively high measured value
@@ -222,17 +239,11 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                                     #  h4("xxxxxxxxxxxxxxxxxx"),#
                                      #h6("xxxxxxxxxxxxxxxxxx."),
                                      div(plotOutput("res.plot3", width=fig.width2, height=fig.height2)), 
-                                    h4("Figure 3 All plots together. Top, indivduals ordered by increasing observed response in treated (left) and control (right) arms. 
+                                    h4("Figure 4 All plots together. Top, indivduals ordered by increasing observed response in treated (left) and control (right) arms. 
                                         Bottom planels show observed response by baseline in treated (left) and control (right) arms. "),         
                             ) ,
                             #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                            tabPanel("ANCOVA", value=6, 
-                                    # h4("Modelling"),
-                                     h4("Here we estimate the treatment effect with a linear model."),
-                                   div( verbatimTextOutput("reg.summary2")),
-                                   p(strong("95% CIs")),
-                                   div( verbatimTextOutput("reg.summary3")),
-                                ) ,
+                      
                             
                             
                             tabPanel("Analyse the variance!", value=6, 
@@ -251,14 +262,16 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                             
                             #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                             tabPanel("Clinical relevant difference", 
-                                     div(plotOutput("reg.plot4", width=fig.width, height=fig.height)),  
+                                     div(plotOutput("reg.plot4", width=fig.width, height=fig.height)), 
+                                     h4("Figure 5 Observed individual changes plotted against baseline, treated (left) and control (right) arms incorporating a clinical relevant difference."),         
+                                     
                                      fluidRow(
                                        column(12,
                                               sliderInput("senn",
                                                           strong("Clinical relevant difference"),
                                                           min=-10, max=10, step=.1, value=-2, ticks=FALSE))
                                      ),
-                                     h4("Figure 4 Observed individual changes plotted against baseline, treated (left) and control (right) arms incorporating a clinical relevant difference."),         
+                                     #h4("Figure 5 Observed individual changes plotted against baseline, treated (left) and control (right) arms incorporating a clinical relevant difference."),         
                                      
                                      p(strong(" ")),
                                      p(strong("We replicate Stephen Senn's example [2], but using a simulated dataset (one realisation). We can calculate analytically using R
@@ -364,7 +377,7 @@ server <- shinyServer(function(input, output   ) {
         } else {
         
         
-        # variable treatment effect
+        # variable treatment effect!
         # beta.treatment <- runif(n,-4,-1 )  # variation in response  
         # beta.treatment <- sample(-1:-4,n,replace=TRUE )
       
@@ -419,6 +432,24 @@ server <- shinyServer(function(input, output   ) {
       return(list(s=s, ci=ci, f0=f0 ))
     })     
     
+    
+    # https://datascienceplus.com/taking-the-baseline-measurement-into-account-constrained-lda-in-r/
+    output$ancova.plot <- renderPlot({         
+      
+      d <- make.data()$d
+      
+      d$Group <- ifelse(d$treat== 1, "Treated", "Placebo")
+
+      fav.col=c("#1A425C", "#8AB63F")
+      ggplot(d, aes (x=y.0observed,y=y.1observed, col=Group)) + 
+        geom_point() + geom_smooth(method="lm", se=FALSE) + 
+        scale_color_manual(values=fav.col) + theme_bw() +
+        xlab("Response") + 
+        ylab("Baseline version of response")
+    
+    })
+    
+  
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     output$reg.summary <- renderPrint({
        
@@ -607,6 +638,8 @@ server <- shinyServer(function(input, output   ) {
       
       grid(nx = NULL, ny = NULL, col = "lightgray", lty = "dotted")
       abline(h=0, lwd=c(1))
+      title(main = "", sub = "Patients observed to respond coloured blue, otherwise black; dashed horizontal line denotes the true treatment effect, treated only. Red dashed line is linear regression line of best fit.",  
+            adj=0,cex.sub = 0.75, font.sub = 1, col.sub = "black")
       #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       
       ctr <- trial[trial$treat==0,]
@@ -648,6 +681,10 @@ server <- shinyServer(function(input, output   ) {
       grid(nx = NULL, ny = NULL, col = "lightgray", lty = "dotted")
       abline(h=0, lwd=c(1))
       with(ctr, abline(h=(beta.treatment), col=c("forestgreen"), lty="dashed",  lwd=c(2) ))
+      
+      title(main = "", sub = "Red dashed line is linear regression line of best fit.",  
+            adj=0,cex.sub = 0.75, font.sub = 1, col.sub = "black")
+      
       par(mfrow=c(1,1))
       
     })
@@ -831,10 +868,10 @@ server <- shinyServer(function(input, output   ) {
       ctr$col2 =   ifelse(ctr$diff >  (sample$trt), "blue" , "black")   
       
       if ( beta.treatment <  0) {
-        foo$colz = foo$col1
+        ctr$colz = foo$col1
         tex <- paste0("Control arm: Individual changes against baseline, \nPearson's correlation ",cr,"\n N= ",CN,", No of responders= ",C," (",CT,"%), non responders=",CN-C," (",100-CT,"%)")
       } else {
-        foo$colz = foo$col2
+        ctr$colz = foo$col2
         tex <- paste0("Control arm: Individual changes against baseline, \nPearson's correlation ",cr,"\n N= ",CN,", No of responders= ",CN-C," (",100-CT,"%), non responders=",CN," (",100-CT,"%)")
       }
       
