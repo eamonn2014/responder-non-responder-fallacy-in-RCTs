@@ -523,7 +523,9 @@ server <- shinyServer(function(input, output   ) {
              col=  foo$colz)
         grid(nx = NULL, ny = NULL, col = "lightgray", lty = "dotted")
         abline(h=0)
-        abline(h=input$trt, lty=2)
+      # abline(h=input$trt, lty=2)
+        abline(h=(input$trt), col=c("forestgreen"), lty="dashed", lwd=c(2) ) 
+        
         title(main = "", sub = "Patients observed to respond coloured blue, otherwise black; dashed horizontal line denotes the true treatment effect, treated only",  
               adj=0,cex.sub = 0.75, font.sub = 1, col.sub = "black"
               
@@ -554,7 +556,8 @@ server <- shinyServer(function(input, output   ) {
         grid(nx = NULL, ny = NULL, col = "lightgray", lty = "dotted")
         
         abline(h=0)
-        abline(h=input$trt, lty=2)
+        #abline(h=input$trt, lty=2)
+        abline(h=(input$trt), col=c("forestgreen"), lty="dashed", lwd=c(2) ) 
         title(main = "", sub = "Patients observed to respond coloured blue, otherwise black; dashed horizontal line denotes the true treatment effect, treated only",  
               adj=0,cex.sub = 0.75, font.sub = 1, col.sub = "black"
               
@@ -624,7 +627,7 @@ server <- shinyServer(function(input, output   ) {
                      ylim=c(mi,ma), xlim=c(mix,max) )) 
       
       with(trt, abline(lm(diff ~  y.0observed), col=c("red"), lty=c(1), lwd=c(2) ) )
-      with(trt, abline(h=mean(beta.treatment), col=c("forestgreen"), lty="dashed", lwd=c(2) ) )
+      with(trt, abline(h=(beta.treatment), col=c("forestgreen"), lty="dashed", lwd=c(2) ) )
       
       grid(nx = NULL, ny = NULL, col = "lightgray", lty = "dotted")
       abline(h=0, lwd=c(1))
