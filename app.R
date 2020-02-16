@@ -922,7 +922,7 @@ server <- shinyServer(function(input, output   ) {
       abline(h=0)
       abline(h=input$trt, lty=2)
       abline(h=input$senn, lty=2, col="blue")
-      title(main = "", sub = "Patients observed to respond coloured blue, otherwise black; blue dashed line denotes clincal relevant difference, black dashed line the true trt effect in treated only",  
+      title(main = "", sub = "Patients observed to respond coloured blue, otherwise black; blue dashed line denotes clincal relevant difference",  
             adj=0,cex.sub = 0.75, font.sub = 1, col.sub = "black"
             
       )
@@ -953,7 +953,7 @@ server <- shinyServer(function(input, output   ) {
       abline(h=0)
       abline(h=input$trt, lty=2)
       abline(h=input$senn, lty=2, col="blue")
-      title(main = "", sub = "Patients observed to respond coloured blue, otherwise black; blue dashed line denotes clincal relevant difference, black dashed line the true trt effect in treated only",  
+      title(main = "", sub = "Patients observed to respond coloured blue, otherwise black; black dashed line the true trt effect, which should only manifest in the treated only",  
             adj=0,cex.sub = 0.75, font.sub = 1, col.sub = "black"
             
       )
