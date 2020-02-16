@@ -60,8 +60,7 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                          h4("
                         
                          The first slider is the 'Treatment effect', every patient in the treatment arm 
-                        experiences this effect. So a constant treatment effect is given to ALL in the treated group.
-                        Conversely , NO ONE in the control group receives the treatment effect. The 'Random noise' slider is a term representing the within person variation and measurement variation. 
+                        experiences this effect. So a constant treatment effect is given to ALL in the treated group. Conversely, NO ONE in the control group receives the treatment effect. The 'Random noise' slider is a term representing the within person variation and measurement variation. 
                         The next two sliders are the 'Population mean' and 'Population SD', 
                         this standard deviation is the between 
                         person variation.
