@@ -73,7 +73,7 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                      br(), # br(),
                      tags$style(".well {background-color:#b6aebd ;}"), ##ABB0B4AF
                      
-                     h4("The first tab 'ANOVA' presents the appropriate approach to estimating the treatment effect for this study design.
+                     h4("The first tab 'ANCOVA' presents the appropriate approach to estimating the treatment effect for this study design.
                         The next tab presents the observed treatment effect for each patient ordered by magnitude, for each trial arm. There is a typical shape to the distibution,
                         few patients have large changes, most small changes. 
                         The third tab shows the treatment effect by baseline values. Typically we see a negative correlation. 
