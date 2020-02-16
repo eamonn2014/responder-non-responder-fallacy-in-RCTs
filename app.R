@@ -972,9 +972,33 @@ server <- shinyServer(function(input, output   ) {
       beta.treatment <-  sample$trt   
       senn <- (input$senn)
       
-      res <- 1- pnorm( (beta.treatment-senn)/ sqrt(noise^2+noise^2)    )
-      res2 <- 1-pnorm( (0-senn)/ sqrt(noise^2+noise^2)    )
+      
+      if (beta.treatment < 0 & senn > 0 ) {
+        
+          res <-  pnorm( (beta.treatment-senn)/ sqrt(noise^2+noise^2)    )
+          res2 <- pnorm( (0-senn)/ sqrt(noise^2+noise^2)    )
+      
+      }  else if (beta.treatment < 0 & senn <  0 ) {
+        
+          res <-  1- pnorm( (beta.treatment-senn)/ sqrt(noise^2+noise^2)    )
+          res2 <- 1- pnorm( (0-senn)/ sqrt(noise^2+noise^2)    )
+        
+      }  else  if (beta.treatment > 0 & senn < 0 ) {
+        
+          res <-  1- pnorm( (beta.treatment-senn)/ sqrt(noise^2+noise^2)    )
+          res2 <- 1- pnorm( (0-senn)/ sqrt(noise^2+noise^2)    )
+        
+         # beta.treatment > 0 & senn > 0 
+        } else  {
+          
+          res <-   pnorm( (beta.treatment-senn)/ sqrt(noise^2+noise^2)    )
+          res2 <-  pnorm( (0-senn)/ sqrt(noise^2+noise^2)    )
+      }  
+        
+        
+      
       return(list(res=res , res2=res2))
+   
     })     
     
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
