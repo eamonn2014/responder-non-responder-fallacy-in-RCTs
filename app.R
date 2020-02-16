@@ -54,12 +54,9 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                    sidebarPanel( width=3 ,
                       
                      tags$style(type="text/css", ".span8 .well { background-color: #00FFFF; }"),
-                      
                       #wellPanel(style = "background: #2171B5",),
                      #The first slider sets the power and the next alpha level, so we can power the trial as we wish. 
-                         h4("
-                        
-                         The first slider is the 'Treatment effect', every patient in the treatment arm 
+                         h4("The first slider is the 'Treatment effect', every patient in the treatment arm 
                         experiences this effect. So a constant treatment effect is given to ALL in the treated group. Conversely, NO ONE in the control group receives the treatment effect. The 'Random noise' slider is a term representing the within person variation and measurement variation. 
                         The next two sliders are the 'Population mean' and 'Population SD', 
                         this standard deviation is the between 
@@ -139,7 +136,7 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                             div(p(" ")),
                             tags$a(href = "https://www.youtube.com/watch?v=uiCd9m6tmt0&feature=youtu.be", "[3] Professor George Davey Smith - Some constraints on the scope and potential of personalised medicine"),
                             div(p(" ")),
-                             tags$a(href = "https://physoc.onlinelibrary.wiley.com/doi/epdf/10.1113/EP085070", "[4] True and false interindividual differencesin the physiological response to an intervention"),
+                             tags$a(href = "https://physoc.onlinelibrary.wiley.com/doi/epdf/10.1113/EP085070", "[4] True and false interindividual differences in the physiological response to an intervention"),
                              div(p(" ")),
                             tags$a(href = "https://twitter.com/f2harrell/status/1220700181496320001", "[5] Purpose of RCT"),
                              div(p(" ")),
