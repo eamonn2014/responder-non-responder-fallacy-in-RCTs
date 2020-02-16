@@ -6,8 +6,7 @@
   library(nlme)
   library(VCA)
   library(MASS)
-  require(tidyverse)
-  require(ggplot2)
+  library(tidyverse)
   library(shinyWidgets)
   library(shinythemes)  # more funky looking apps
   
@@ -30,7 +29,6 @@
   
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/packages/shinythemes/versions/1.1.2
-                
                 # paper
 
                 setBackgroundColor(
@@ -39,8 +37,6 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                   direction = "bottom"
                 ),
 
-            
-                
                 h2("Responder, non responder fallacy in parallel RCTs"),
 
                 h4("  We perform a simulation of a parallel randomised (1:1) control trial demonstrating one reason why it is wrong to analyse arms 
@@ -52,9 +48,7 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                 h3("  "), 
                # shinyUI(pageWithSidebar(
               #     titlePanel("Hello Shiny!"),
-                   
-                   
-                   
+
                    sidebarLayout(
                     
                    sidebarPanel( width=3 ,
@@ -62,7 +56,6 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                      tags$style(type="text/css", ".span8 .well { background-color: #00FFFF; }"),
                       
                       #wellPanel(style = "background: #2171B5",),
-                     
                      #The first slider sets the power and the next alpha level, so we can power the trial as we wish. 
                          h4("
                         
@@ -80,8 +73,6 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                      actionButton("resample", "Simulate a new sample"),
                      br(), # br(),
                      tags$style(".well {background-color:#b6aebd ;}"), ##ABB0B4AF
-                     
-                     
                      
                      h4("The first tab 'ANOVA' presents the appropriate approach to estimating the treatment effect for this study design.
                         The next tab presents the observed treatment effect for each patient ordered by magnitude, for each trial arm. There is a typical shape to the distibution,
@@ -101,9 +92,6 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                             tags$style(HTML('#resample{background-color:orange}'))
                           ),
                           
-                          
-                         
-                            
                             #div(strong("Select the parameters using the sliders below"),p(" ")),
                            # div((" ")),
                             #br(),
@@ -183,9 +171,8 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                             .navbar-default .navbar-nav > li > a[data-value='t3'] {color: green;background-color: lightgreen;}
 
                    ")),
-                            
+                            #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~end of section to add colour     
                             tabPanel("1 ANCOVA", value=6, 
-                                     # h4("Modelling"),
                                      h4("First we show the preferred approach, estimate the treatment effect with a linear model."),
                                      
                                      fluidRow(
@@ -201,7 +188,6 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                             ) ,
                             #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~end of section to add colour     
                             tabPanel("2 Plot change in order of magnitude", 
-                                     #    h2("Plotting the data"),
                                      div(plotOutput("reg.plot1", width=fig.width, height=fig.height)),  
                                      h4("Figure 2 Observed change in each patient in order of magnitude, blue observed 'responders'. Treated (left) and control arm (right)."),
                                      
@@ -221,11 +207,9 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                                               measurement error and regression to the mean. Slide the 'Random noise' to zero to see.")),
                                      p(strong("The crux of the problem, focus on the left panel. How do you predict the order of the patients? You cannot, it is random.")),
                                      
-                                
                             ) ,
                             #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                             tabPanel("3 Plot change against baseline",
-                                     #h4("Fxxxxxxxxxxxxxxxxxxxxxxxxxxxx"),
                                      div(plotOutput("res.plot2", width=fig.width, height=fig.height)),  
                                      h4("Figure 3 Observed individual changes plotted against baseline, treated (left) and control (right) arms."),         
                                      
@@ -235,20 +219,14 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                                   at baseline. This regression to the mean leads to the artefact of a negative correlation between change and initial value (or any other variable that is correlated with the initial value).
                                               ")),
                             ),
-                            
                             #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                             tabPanel("4 All plots together", value=3, 
-                                    #  h4("xxxxxxxxxxxxxxxxxx"),#
-                                     #h6("xxxxxxxxxxxxxxxxxx."),
                                      div(plotOutput("res.plot3", width=fig.width2, height=fig.height2)), 
                                     h4("Figure 4 All plots together. Top, indivduals ordered by increasing observed response in treated (left) and control (right) arms. 
                                         Bottom planels show observed response by baseline in treated (left) and control (right) arms. "),         
                             ) ,
                             #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                      
-                            
-                            
-                            tabPanel("5 Analyse the variance!", value=6, 
+                             tabPanel("5 Analyse the variance!", value=6, 
                                                           h4("Fisher in a letter on this topic in 1938 said to look at the variance in the outcome (suggesting an increase variance in the treated group) [3]. 
                                         Is there any evidence against the null hypothesis that the variance in the outcome in the trial arms differ? 
                                         The P-Value testing this hypothesis will for the vast majority of the time not reject the null hypothesis.  
@@ -271,7 +249,6 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                                               div( verbatimTextOutput("reg.lmm2")),
                                        ))),
                             ) ,
-                            
                             #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                             tabPanel("6 Clinical relevant difference", 
                                      div(plotOutput("reg.plot4", width=fig.width, height=fig.height)), 
@@ -368,15 +345,15 @@ server <- shinyServer(function(input, output   ) {
         power = .99
         alpha=0.01
         
-      # ttest power is used to get the sample size
+        # ttest power is used to get the sample size
         N <- round(power.t.test( delta = beta.treatment, sd= pop_sd , 
                                  sig.level= alpha, power= power,
                                  type="two.sample", alternative=c("two.sided"))$n*2)
         
         treat <- 1*(runif(n)<.5)                             # random treatment allocation
         
-        # to avoid floating point errors add small amount to reponders are counted as responders when  noise sd =0 only
-        if (noise==0) {
+        # to avoid floating point errors add small amount to reponders  when  noise sd =0 only
+        if (noise==0 & beta.treatment > 0 ) {
           
           epsilon =0.00001
           
@@ -386,14 +363,23 @@ server <- shinyServer(function(input, output   ) {
           
           delta.observed <- y.1observed - y.0observed   
           
+        } else if (noise==0 & beta.treatment< 0 ) {
+        
+          epsilon =0.00001
+          
+          y.0observed <- y.0true <- rnorm(n, pop_mu, pop_sd) 
+          
+          y.1observed <- y.1true <-  y.0true +  treat*beta.treatment - epsilon
+          
+          delta.observed <- y.1observed - y.0observed   
+          
         } else {
-        
-        
         # variable treatment effect!
         # beta.treatment <- runif(n,-4,-1 )  # variation in response  
         # beta.treatment <- sample(-1:-4,n,replace=TRUE )
       
         y.0true <- rnorm(n, pop_mu, pop_sd)                  # true baseline
+        
         y.0observed <- y.0true + rnorm(n, 0, 1*noise)        # observed baseline 
         
         y.1true <- y.0true + (treat*beta.treatment)          # true follow up, treated only respond
@@ -401,6 +387,7 @@ server <- shinyServer(function(input, output   ) {
         ##################################################################
         
         y.1observed <- y.1true + rnorm(n, 0, 1*noise)        # observed follow up, noise added 
+        
         delta.observed <- y.1observed - y.0observed      
         
         }
@@ -510,8 +497,6 @@ server <- shinyServer(function(input, output   ) {
          
          par(mfrow=c(1,2))
         # ---------------------------------------------------------------------------
-      
-        
         xup <-  max(table(trial$treat))  # new
        
         # select treated
@@ -519,7 +504,6 @@ server <- shinyServer(function(input, output   ) {
         trt$diff <- trt$delta.observed  
   
         foo <- sort(trt[,"diff"])
-        
         # ---------------------------------------------------------------------------
         foo <- data.frame(foo, col1=NA, col2=NA)
         foo$col1 =   ifelse(foo$foo <=    beta.treatment, "blue" , "black")     # -ve trt effect cols   
@@ -563,7 +547,6 @@ server <- shinyServer(function(input, output   ) {
           foo$colz = foo$col2
           tex <- paste0("Control patients \n N= ",CN,", No of responders= ",CN-C," (",100-CT,"%), non responders=",C," (",CT,"%)") 
         }
-        
         # ---------------------------------------------------------------------------
         plot(foo$foo, main=tex,
              ylab= "follow up - baseline", xlab="Individual subjects ordered by observed response", 
@@ -599,7 +582,6 @@ server <- shinyServer(function(input, output   ) {
       AN=stats()$AN
       CN=stats()$CN
       
-      
       diff <- trial$y.1observed - trial$y.0observed
       mi <-  min( diff)*1.2
       ma <-  max(diff)*1.2
@@ -607,7 +589,6 @@ server <- shinyServer(function(input, output   ) {
       x <- trial$y.0observed
       mix <-  min( x) 
       max <-  max(x) 
-      
       #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       trt <- trial[trial$treat==1,]
       trt$diff <- trt$y.1observed - trt$y.0observed
@@ -623,7 +604,6 @@ server <- shinyServer(function(input, output   ) {
       trt$col1 =   ifelse(trt$diff <=  (sample$trt), "blue" , "black")         
       trt$col2 =   ifelse(trt$diff >   (sample$trt), "blue" , "black")           
       
-      
       if ( beta.treatment <  0) {
         trt$colz = trt$col1
         tex <- paste0("Treatment arm: Individual changes against baseline, \nPearson's correlation ",cr,"\n N= ",AN,", No of responders= ",A," (",AT,"%), non responders=",AN-A," (",100-AT,"%)")
@@ -631,7 +611,6 @@ server <- shinyServer(function(input, output   ) {
         trt$colz = trt$col2
         tex <- paste0("Treatment arm: Individual changes against baseline, \nPearson's correlation ",cr,"\n N= ",AN,", No of responders= ",AN-A," (",100-AT,"%), non responders=",A," (",AT,"%)")
       }
-      
       
       par(mfrow=c(1,2))
       with(trt, plot(diff ~  y.0observed, 
@@ -650,10 +629,9 @@ server <- shinyServer(function(input, output   ) {
       
       grid(nx = NULL, ny = NULL, col = "lightgray", lty = "dotted")
       abline(h=0, lwd=c(1))
-      title(main = "", sub = "Patients observed to respond coloured blue, otherwise black; dashed horizontal line denotes the true treatment effect, treated only. Red dashed line is linear regression line of best fit.",  
+      title(main = "", sub = "Patients observed to respond coloured blue, otherwise black; dashed horizontal line denotes the true treatment effect, treated only.",  
             adj=0,cex.sub = 0.75, font.sub = 1, col.sub = "black")
       #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      
       ctr <- trial[trial$treat==0,]
       ctr$diff <- ctr$y.1observed - ctr$y.0observed
       
@@ -676,7 +654,6 @@ server <- shinyServer(function(input, output   ) {
         tex <- paste0("Control arm: Individual changes against baseline, \nPearson's correlation ",cr,"\n N= ",CN,", No of responders= ",CN-C," (",100-CT,"%), non responders=",CN," (",100-CT,"%)")
       }
       
-      
       with(ctr, plot(diff ~  y.0observed, 
                      col=  ifelse(beta.treatment <  0, ctr$col1 , 
                            ifelse(beta.treatment >  0, ctr$col2 ,    NA )) ,
@@ -686,7 +663,6 @@ server <- shinyServer(function(input, output   ) {
                                 # , "; control patients \n N= ",CN,", No of responders= ",C," (",CT,"%)")
                      cex.main =1.25,
                      ylim=c(mi,ma), xlim=c(mix,max) ) ) 
-      
       
       with(ctr, abline(lm(diff ~  y.0observed), col=c("red"), lty=c(1), lwd=c(2) ) )
       
@@ -704,7 +680,6 @@ server <- shinyServer(function(input, output   ) {
     # --------------------------------------------------------------------------
     # --------------------------------------------------------------------------   
     # 3rd tab
-    
     output$res.plot3 <- renderPlot({       
       
       sample <- random.sample()
@@ -749,7 +724,6 @@ server <- shinyServer(function(input, output   ) {
       #      and random error (within subject and measurement error)"
       # tex <- paste0("Treated patients: N= ",AN,", No of responders= ",A," (",AT,"%)")
       
-      
       if ( beta.treatment <  0) {
         foo$colz = foo$col1
         tex <- paste0("Treated patients, responders coloured blue \n N= ",AN,", No of responders= ",A," (",AT,"%), non responders=",AN-A," (",100-AT,"%)")
@@ -757,11 +731,7 @@ server <- shinyServer(function(input, output   ) {
         foo$colz = foo$col2
         tex <- paste0("Treated patients, responders coloured blue \n N= ",AN,", No of responders= ",AN-A," (",100-AT,"%), non responders=",A," (",AT,"%)")
       }
-      
-      
-      
-      
-      
+ 
       plot(foo$foo, main=tex, 
            ylab= "follow up - baseline", xlab="Individual subjects order by observed response", 
            xlim=c(0, xup), ylim=c(mi,ma), #length(trt[,"diff"])
@@ -771,11 +741,7 @@ server <- shinyServer(function(input, output   ) {
       with(trt, abline(v=A, col="black", lty="dashed"))
       with(trt, abline(h=0, col="black", lty=1))
       with(trt, abline(h=(beta.treatment), col=c("forestgreen"), lty=c(2), lwd=c(1) ) )
-    
-            
       # ---------------------------------------------------------------------------
-      
-      
       trt <- trial[trial$treat==0,]
       trt$diff <- trt$y.1observed - trt$y.0observed
       
@@ -788,8 +754,7 @@ server <- shinyServer(function(input, output   ) {
       foo$col2 =   ifelse(foo$foo >    trt$beta.treatment, "blue" , "black")   
       
       #if (trt$beta.treatment <  0) {foo$colz = foo$col1} else {foo$colz = foo$col2}
-      
- 
+
       if ( beta.treatment <  0) {foo$colz = foo$col1
       tex <- paste0("Control patients, responders coloured blue\n N= ",CN,", No of responders= ",C," (",CT,"%), non responders=",CN-C," (",100-CT,"%)")
       } else {
@@ -818,7 +783,6 @@ server <- shinyServer(function(input, output   ) {
       mix <-  min( x) 
       max <-  max(x) 
       
-      
       trt <- trial[trial$treat==1,]
       trt$diff <- trt$y.1observed - trt$y.0observed
       
@@ -840,9 +804,7 @@ server <- shinyServer(function(input, output   ) {
         foo$colz = foo$col2
         tex <- paste0("Treatment arm: Individual changes against baseline, \nPearson's correlation ",cr,"\n N= ",AN,", No of responders= ",AN-A," (",100-AT,"%), non responders=",A," (",AT,"%)")
       }
-      
-      
-      
+
       with(trt, plot(diff ~  y.0observed,
                      
                      col=  ifelse(beta.treatment <=  0, trt$col1 , 
@@ -853,9 +815,6 @@ server <- shinyServer(function(input, output   ) {
                      , xlab="observed baseline",  ylab="follow up - baseline"  ,
                      
                      main=tex, #paste0("Treatment arm: observed responders in blue\nPearson's correlation ",cr),
-                     
-                 
-                     
                      
                      cex.main =1.25,
                      ylim=c(mi,ma), xlim=c(mix,max) ))
@@ -917,8 +876,7 @@ server <- shinyServer(function(input, output   ) {
       trial <- make.data()$trial
        sample <- random.sample()
       N <- make.data()$N
-      
-      
+
       diff <- trial$y.1observed - trial$y.0observed
       mi <-  min( diff)*1.2
       ma <-  max(diff)*1.2
@@ -934,9 +892,6 @@ server <- shinyServer(function(input, output   ) {
       C.SENN =stats()$C.SENN
       TC.SENN =stats()$TC.SENN
       CT.SENN =stats()$CT.SENN
-     
-      
-     
 
       xup <-  max(table(trial$treat))  # new
 
@@ -1008,8 +963,7 @@ server <- shinyServer(function(input, output   ) {
     # --------------------------------------------------------------------------
     # --------------------------------------------------------------------------
     # --------------------------------------------------------------------------
-
-  senn2 <- reactive({
+    senn2 <- reactive({
       
       sample <- random.sample()
       
@@ -1034,10 +988,7 @@ server <- shinyServer(function(input, output   ) {
       return(senn2()$res2)
       
     })
-    
     #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   
-   
     # ---------------------------------------------------------------------------
     # get some counts and percentage for observed resp and non resp
    stats <- reactive({
@@ -1048,7 +999,6 @@ server <- shinyServer(function(input, output   ) {
       
       
       N <- nrow(trial)
-    
       # ---------------------------------------------------------------------------treated
          
           trt <- trial[trial$treat==1,]
@@ -1071,7 +1021,6 @@ server <- shinyServer(function(input, output   ) {
           C.SENN <- mean(foo < input$senn)*length(foo)
           CT.SENN <- round(C.SENN/length(foo)*100,1)
       
-  
       # Z <- data.frame(AN=AN, A=A, AT=AT, CN=CN, C=C, CT= CT)
       # names(Z) <- c("N trt","Observed responders trt",  "%" , "N ctrl","Observed responders ctrl" , "%")
       # rownames(Z) <- NULL
@@ -1080,9 +1029,7 @@ server <- shinyServer(function(input, output   ) {
                   C.SENN=C.SENN , CT.SENN=CT.SENN)) 
       
     })
-   
-    
-    
+    # ---------------------------------------------------------------------------
     lmm <- reactive({
       
       sample <- random.sample()
@@ -1114,35 +1061,40 @@ server <- shinyServer(function(input, output   ) {
     
     })
     
-    
+    # ---------------------------------------------------------------------------
     output$reg.lmm0 <- renderPrint({
       
       return(lmm()$m0)
       
     })
      
+    # ---------------------------------------------------------------------------
     
     output$reg.lmm1 <- renderPrint({
       
       return(lmm()$m1)
       
     })
+    # ---------------------------------------------------------------------------
     
     output$reg.lmm2 <- renderPrint({
       
       return(lmm()$m2)
       
     })
-     
+    # ---------------------------------------------------------------------------
+    
    output$A <- renderPrint({
       stats()$A
     }) 
+    # ---------------------------------------------------------------------------
     
     output$C <- renderPrint({
       stats()$C
     }) 
     
-     
+    # ---------------------------------------------------------------------------
+    
     output$xx <- renderPrint({ 
       
       m  <- stats()$Z
@@ -1150,6 +1102,7 @@ server <- shinyServer(function(input, output   ) {
           return(m )
     })
     
+    # ---------------------------------------------------------------------------
     
     output$tablex <- DT::renderDataTable({
 
@@ -1180,9 +1133,7 @@ server <- shinyServer(function(input, output   ) {
           digits=c(2,2,2,2)  )
     })
 
-    
     # ---------------------------------------------------------------------------
-
     output$table1 <- DT::renderDataTable({
         
         foo<- make.data()$d
