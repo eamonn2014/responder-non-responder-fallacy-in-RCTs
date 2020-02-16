@@ -83,10 +83,10 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                      
                      
                      h4("The first tab 'ANOVA' presents the appropriate approach to assessing if there is evidence of non constant treatment effect.
-                        The next tab present the observed treatment effect for each patient ordered by magnitude, for each trial arm. There is a typical shape to the distibution,
+                        The next tab presents the observed treatment effect for each patient ordered by magnitude, for each trial arm. There is a typical shape to the distibution,
                         few patients have large changes, most small changes. 
                         The third tab shows the treatment effect by baseline values. Typically we see a negative correlation. 
-                        The forth tab presents all previous plots from the previous two tabs together. 
+                        The fourth tab presents plots from the previous two tabs together. 
                         The fifth tab reproduces via simulation a Stephen Senn example [2].
                         Lastly, a listing of the data is presented."),
                         div(
