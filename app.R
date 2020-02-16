@@ -443,8 +443,8 @@ server <- shinyServer(function(input, output   ) {
       ggplot(d, aes (x=y.0observed,y=y.1observed, col=Group)) + 
         geom_point() + geom_smooth(method="lm", se=FALSE) + 
         scale_color_manual(values=fav.col) + theme_bw() +
-        xlab("Response") + 
-        ylab("Baseline version of response")
+        xlab("Baseline version of response") + 
+        ylab("Response")
     
     })
     
