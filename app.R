@@ -609,7 +609,7 @@ server <- shinyServer(function(input, output   ) {
         tex <- paste0("Treatment arm: Individual changes against baseline, \nPearson's correlation ",cr,"\n N= ",AN,", No of responders= ",A," (",AT,"%), non responders=",AN-A," (",100-AT,"%)")
       } else {
         trt$colz = trt$col2
-        tex <- paste0("Treatment arm: Individual changes against baseline, \nPearson's correlation ",cr,"\n N= ",AN,", No of responders= ",AN-A," (",100-AT,"%), non responders=",A," (",AT,"%)")
+        tex <- paste0("Treatment arm: Individual changes against baseline, \nPearson's correlation ",cr,"\n N= ",AN,", No of responders= ",A," (",AT,"%), non responders=",AN-A," (",100-AT,"%)")
       }
       
       par(mfrow=c(1,2))
@@ -651,7 +651,7 @@ server <- shinyServer(function(input, output   ) {
         tex <- paste0("Control arm: Individual changes against baseline, \nPearson's correlation ",cr,"\n N= ",CN,", No of responders= ",C," (",CT,"%), non responders=",CN-C," (",100-CT,"%)")
       } else {
         ctr$colz = ctr$col2
-        tex <- paste0("Control arm: Individual changes against baseline, \nPearson's correlation ",cr,"\n N= ",CN,", No of responders= ",CN-C," (",100-CT,"%), non responders=",CN," (",100-CT,"%)")
+        tex <- paste0("Control arm: Individual changes against baseline, \nPearson's correlation ",cr,"\n N= ",CN,", No of responders= ",C," (",CT,"%), non responders=",CN-C," (",100-CT,"%)")
       }
       
       with(ctr, plot(diff ~  y.0observed, 
@@ -759,7 +759,7 @@ server <- shinyServer(function(input, output   ) {
       tex <- paste0("Control patients, responders coloured blue\n N= ",CN,", No of responders= ",C," (",CT,"%), non responders=",CN-C," (",100-CT,"%)")
       } else {
         foo$colz = foo$col2
-        tex <- paste0("Control patients, responders coloured blue\n N= ",CN,", No of responders= ",CN-C," (",100-CT,"%), non responders=",C," (",CT,"%)") 
+        tex <- paste0("Control patients, responders coloured blue\n N= ",CN,", No of responders= ",CN-C," (",CT,"%), non responders=",C," (",100-CT,"%)") 
       }
       
       plot(foo$foo, main=tex,
@@ -843,7 +843,7 @@ server <- shinyServer(function(input, output   ) {
         tex <- paste0("Control arm: Individual changes against baseline, \nPearson's correlation ",cr,"\n N= ",CN,", No of responders= ",C," (",CT,"%), non responders=",CN-C," (",100-CT,"%)")
       } else {
         ctr$colz = foo$col2
-        tex <- paste0("Control arm: Individual changes against baseline, \nPearson's correlation ",cr,"\n N= ",CN,", No of responders= ",CN-C," (",100-CT,"%), non responders=",CN," (",100-CT,"%)")
+        tex <- paste0("Control arm: Individual changes against baseline, \nPearson's correlation ",cr,"\n N= ",CN,", No of responders= ",CN-C," (",CT,"%), non responders=",C," (",100-CT,"%)")
       }
       
       with(ctr, plot(diff ~  y.0observed, 
