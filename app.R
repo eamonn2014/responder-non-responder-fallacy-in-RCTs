@@ -515,7 +515,7 @@ server <- shinyServer(function(input, output   ) {
            tex <- paste0("Treated patients \n N= ",AN,", No of responders= ",A," (",AT,"%), non responders=",AN-A," (",100-AT,"%)")
            } else {
              foo$colz = foo$col2
-             tex <- paste0("Treated patients \n N= ",AN,", No of responders= ",AN-A," (",100-AT,"%), non responders=",A," (",AT,"%)")
+             tex <- paste0("Treated patients \n N= ",AN,", No of responders= ",A," (",100-AT,"%), non responders=",AN-A," (",AT,"%)")  #AN-A A
            }
         
         plot(foo$foo, main=tex,  
@@ -545,7 +545,7 @@ server <- shinyServer(function(input, output   ) {
         tex <- paste0("Control patients \n N= ",CN,", No of responders= ",C," (",CT,"%), non responders=",CN-C," (",100-CT,"%)")
         } else {
           foo$colz = foo$col2
-          tex <- paste0("Control patients \n N= ",CN,", No of responders= ",CN-C," (",100-CT,"%), non responders=",C," (",CT,"%)") 
+          tex <- paste0("Control patients \n N= ",CN,", No of responders= ",C," (",CT,"%), non responders=",CN-C," (",100-CT,"%)")   #CN-C 
         }
         # ---------------------------------------------------------------------------
         plot(foo$foo, main=tex,
@@ -999,9 +999,11 @@ server <- shinyServer(function(input, output   ) {
       trial <- make.data()$trial
       
       
-      N <- nrow(trial)
+      if (sample$trt < 0) {    
+      
+          N <- nrow(trial)
       # ---------------------------------------------------------------------------treated
-         
+         # trt rel diff -ve
           trt <- trial[trial$treat==1,]
           trt$diff <- trt$delta.observed      # trt effect          
           foo <- sort(trt[,"diff"])                         # sorted treatment effect
@@ -1022,6 +1024,42 @@ server <- shinyServer(function(input, output   ) {
           C.SENN <- mean(foo < input$senn)*length(foo)
           CT.SENN <- round(C.SENN/length(foo)*100,1)
       
+          
+      } else { 
+     
+           N <- nrow(trial)
+           trt <- trial[trial$treat==1,]
+           trt$diff <- trt$delta.observed 
+           foo <- sort(trt[,"diff"])
+           A <- mean(foo > sample$trt)*length(foo)   # 
+           AT <- round(A/length(foo)*100,1)
+           AN <- length(foo)
+           
+           T.SENN <- mean(foo < input$senn)*length(foo)
+           TC.SENN <- round(T.SENN/length(foo)*100,1)
+           # ---------------------------------------------------------------------------
+           trt <- trial[trial$treat==0,]
+           trt$diff <-trt$delta.observed 
+           foo <- sort(trt[,"diff"])
+           C <- mean(foo > sample$trt)*length(foo)   # 
+           CT <- round(C/length(foo)*100,1)
+           CN = length(foo)
+           
+           C.SENN <-mean(foo < input$senn)*length(foo)
+           CT.SENN <- round(C.SENN/length(foo)*100,1)
+   }
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
       # Z <- data.frame(AN=AN, A=A, AT=AT, CN=CN, C=C, CT= CT)
       # names(Z) <- c("N trt","Observed responders trt",  "%" , "N ctrl","Observed responders ctrl" , "%")
       # rownames(Z) <- NULL
