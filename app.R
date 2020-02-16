@@ -228,7 +228,7 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                             #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                              tabPanel("5 Analyse the variance!", value=6, 
                                                           h4("Fisher in a letter on this topic in 1938 said to look at the variance in the outcome (suggesting an increase variance in the treated group) [3]. 
-                                        Is there any evidence against the null hypothesis that the variance in the outcome in the trial arms differ? 
+                                        Is there any evidence against the null hypothesis? H0: variance is equal in both arms H1: variance is bot equal in both arms.
                                         The P-Value testing this hypothesis will for the vast majority of the time not reject the null hypothesis.  
                                         This is what we expect, given that the true magnitude of response in the simulation is constant for all 
                                         patients randomised to the treated arm and constant in the control arm (zero). 
