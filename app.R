@@ -340,11 +340,25 @@ server <- shinyServer(function(input, output   ) {
         power = .99
         alpha=0.01
         
-        
-        # ttest power is used to get the sample size
+      # ttest power is used to get the sample size
         N <- round(power.t.test( delta = beta.treatment, sd= pop_sd , 
                                  sig.level= alpha, power= power,
                                  type="two.sample", alternative=c("two.sided"))$n*2)
+        
+
+        # to avoid floating point errors add small amount to reponders are counted as responders when  noise sd =0 only
+        if (noise==0) {
+          
+          epsilon =0.00001
+          
+          y.0observed <- y.0true <- rnorm(n, pop_mu, pop_sd) 
+          
+          y.1observed <- y.1true <-  y.0true +  treat*beta.treatment + epsilon
+          
+          delta.observed <- y.1observed - y.0observed   
+          
+        } else {
+        
         
         # variable treatment effect
         # beta.treatment <- runif(n,-4,-1 )  # variation in response  
@@ -356,6 +370,15 @@ server <- shinyServer(function(input, output   ) {
         treat <- 1*(runif(n)<.5)                             # random treatment allocation
         y.1true <- y.0true + (treat*beta.treatment)          # true follow up, treated only respond
         
+        
+        
+        ##################################################################
+        
+        y.1observed <- y.1true + rnorm(n, 0, 1*noise)        # observed follow up, noise added 
+        delta.observed <- y.1observed - y.0observed      
+        
+        }
+        
         eligible <- ifelse(y.0observed > ur.eligible*(pop_mu+pop_sd), 1, 0)  # x sds away from pop mu eligible for trial
         
         ##get around the floating point errors############################
@@ -364,28 +387,43 @@ server <- shinyServer(function(input, output   ) {
         # floating point errors were apparant when noise was set to 0
         # as there should 100% - 0% but that was not observed, here I try to 
         # circumevent the errors.
+   
         
-        tol <-  0.99999999999
-        x <-y.1true - y.0true
-      # print(x, digits=16) 
-        fp.err <- which((x > tol) & (x <1) )  # find float point errors
-      #  fp.err           
-        # 'correct' fp errors, duplicate the values in y.1true and y.0true 
-        J <- length(fp.err)
+      #   tol <-  0.99999999999
+      #   x <-y.1true - y.0true
+      # # print(x, digits=16) 
+      #   fp.err <- which((x > tol) & (x <1) )  # find float point errors
+      # #  fp.err           
+      #   # 'correct' fp errors, duplicate the values in y.1true and y.0true 
+      #   J <- length(fp.err)
+      #   
+      #   for (i in 1:J) {
+      #     
+      #     x <- fp.err[i]
+      #     y.1true[x] <- y.0true[x]  # random swap, y0 could be 1 more or one less than y1
+      #     treat[x] <-1
+      #   }
+         
         
-        for (i in 1:J) {
-          
-          x <- fp.err[i]
-          y.1true[x] <- y.0true[x]  # random swap, y0 could be 1 more or one less than y1
-        }
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
         
       #  table(y.1true - y.0true) 
         
         ##################################################################
-        ##################################################################
-        
-        y.1observed <- y.1true + rnorm(n, 0, 1*noise)        # observed follow up, noise added 
-        delta.observed <- y.1observed - y.0observed          # diff for baseline
+    # diff for baseline
         
         d <- data.frame(y.0true, y.0observed, eligible, treat , beta.treatment,
                         y.1true, y.1observed, delta.observed)
@@ -397,6 +435,7 @@ server <- shinyServer(function(input, output   ) {
         trial  <- d[d$eligible==1,]    # select the trial subjects
         
         d <- trial <- trial[1:N,]      # selext out sample size from the population
+       
         
         return(list(trial=trial,  d=d,  N=N)) 
         
@@ -546,7 +585,7 @@ server <- shinyServer(function(input, output   ) {
     output$res.plot2  <- renderPlot({       
       
       sample <- random.sample()
-      
+      beta.treatment <-  sample$trt 
       trial <- make.data()$trial
       
       stats <- stats()
@@ -573,32 +612,37 @@ server <- shinyServer(function(input, output   ) {
       cr$conf.int[1:2]
       cr <- paste0( p2(cr$estimate),", 95%CI (",p2(cr$conf.int[1]),", " ,p2(cr$conf.int[2]), " )")
       
-      trt$col1 =   ifelse(trt$diff <=  beta.treatment, "blue" , "black")         
-      trt$col2 =   ifelse(trt$diff >   beta.treatment, "blue" , "black")           
+      trt$col1 =   ifelse(trt$diff <=  (sample$trt), "blue" , "black")         
+      trt$col2 =   ifelse(trt$diff >  (sample$trt), "blue" , "black")           
+      
+      
+      if ( beta.treatment <  0) {
+        foo$colz = foo$col1
+        tex <- paste0("Treatment arm: Individual changes against baseline, \nPearson's correlation ",cr,"\n N= ",AN,", No of responders= ",A," (",AT,"%), non responders=",AN-A," (",100-AT,"%)")
+      } else {
+        foo$colz = foo$col2
+        tex <- paste0("Treatment arm: Individual changes against baseline, \nPearson's correlation ",cr,"\n N= ",AN,", No of responders= ",AN-A," (",100-AT,"%), non responders=",A," (",AT,"%)")
+      }
       
       
       par(mfrow=c(1,2))
       with(trt, plot(diff ~  y.0observed, 
                      
-                     col=  ifelse(beta.treatment <  trt$diff, trt$col1 , 
-                           ifelse(beta.treatment >  trt$diff, trt$col2 ,    NA )) ,
+                     col=  ifelse(beta.treatment <  0, trt$col1 , 
+                                  ifelse(beta.treatment >  0, trt$col2 ,    NA )) ,
                      pch=16
                      , xlab="observed baseline",  ylab="follow up - baseline"  ,
-                     main=paste0("Treatment arm: Individual changes against baseline, observed responders in blue\nPearson's correlation ",cr
-                                 ," ; treated patients \n N= ",AN,", No of responders= ",A," (",AT,"%)")
+                     main=tex,
                      
                      , cex.main =1.25,
                      ylim=c(mi,ma), xlim=c(mix,max) ))
       
       with(trt, abline(lm(diff ~  y.0observed), col=c("red"), lty=c(1), lwd=c(2) ) )
-      with(trt, abline(h= (beta.treatment), col=c("forestgreen"), lty="dashed", lwd=c(2) ) )
+      with(trt, abline(h=mean(beta.treatment), col=c("forestgreen"), lty="dashed", lwd=c(2) ) )
       
       grid(nx = NULL, ny = NULL, col = "lightgray", lty = "dotted")
       abline(h=0, lwd=c(1))
-      
-      # ---------------------------------------------------------------------------
-      # ---------------------------------------------------------------------------
-      # ---------------------------------------------------------------------------
+      #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       
       ctr <- trial[trial$treat==0,]
       ctr$diff <- ctr$y.1observed - ctr$y.0observed
@@ -608,16 +652,25 @@ server <- shinyServer(function(input, output   ) {
       cr$conf.int[1:2]
       cr <- paste0( p2(cr$estimate),", 95%CI (",p2(cr$conf.int[1]),", " ,p2(cr$conf.int[2]), " )")
       
-      ctr$col1 =   ifelse(beta.treatment <  trt$diff, "blue" , "black")         
-      ctr$col2 =   ifelse(beta.treatment >  trt$diff, "blue" , "black")   
+      ctr$col1 =   ifelse(ctr$diff <=  (sample$trt), "blue" , "black")         
+      ctr$col2 =   ifelse(ctr$diff >  (sample$trt), "blue" , "black")   
+      
+      if ( beta.treatment <  0) {
+        foo$colz = foo$col1
+        tex <- paste0("Control arm: Individual changes against baseline, \nPearson's correlation ",cr,"\n N= ",CN,", No of responders= ",C," (",CT,"%), non responders=",CN-C," (",100-CT,"%)")
+      } else {
+        foo$colz = foo$col2
+        tex <- paste0("Control arm: Individual changes against baseline, \nPearson's correlation ",cr,"\n N= ",CN,", No of responders= ",CN-C," (",100-CT,"%), non responders=",CN," (",100-CT,"%)")
+      }
+      
       
       with(ctr, plot(diff ~  y.0observed, 
-                     col=  ifelse(beta.treatment <  ctr$diff, ctr$col1 , 
-                                  ifelse(beta.treatment >  ctr$diff, ctr$col2 ,    NA )) ,
+                     col=  ifelse(beta.treatment <  0, ctr$col1 , 
+                                  ifelse(beta.treatment >  0, ctr$col2 ,    NA )) ,
                      pch=16
                      , xlab="observed baseline",  ylab="follow up - baseline"  ,
-                     main=paste0("Control arm:  Individual changes against baseline, observed responders in blue\nPearson's correlation ",cr
-                                 , "; control patients \n N= ",CN,", No of responders= ",C," (",CT,"%)")
+                     main=tex, #paste0("Control arm:  Individual changes against baseline, observed responders in blue\nPearson's correlation ",cr
+                                # , "; control patients \n N= ",CN,", No of responders= ",C," (",CT,"%)")
                      , cex.main =1.25,
                      ylim=c(mi,ma), xlim=c(mix,max) ) ) 
       
@@ -654,7 +707,7 @@ server <- shinyServer(function(input, output   ) {
       diff <- trial$y.1observed - trial$y.0observed
       mi <-  min( diff)*1.2
       ma <-  max(diff)*1.2
-      
+      beta.treatment <-  sample$trt 
       # ---------------------------------------------------------------------------
       par(mfrow=c(2,2))
       # par(bg = 'ivory')
@@ -673,11 +726,25 @@ server <- shinyServer(function(input, output   ) {
       foo$col2 =   ifelse(foo$foo >    trt$beta.treatment, "blue" , "black")   
       
       if (trt$beta.treatment <  0) {foo$colz = foo$col1} else {foo$colz = foo$col2}
+      # 
+      # tex <- "Individual changes in response in treated arm
+      #      Suggested individual differences due entirely to regression to the mean
+      #      and random error (within subject and measurement error)"
+      # tex <- paste0("Treated patients: N= ",AN,", No of responders= ",A," (",AT,"%)")
       
-      tex <- "Individual changes in response in treated arm
-           Suggested individual differences due entirely to regression to the mean
-           and random error (within subject and measurement error)"
-      tex <- paste0("Treated patients: N= ",AN,", No of responders= ",A," (",AT,"%)")
+      
+      if ( beta.treatment <  0) {
+        foo$colz = foo$col1
+        tex <- paste0("Treated patients \n N= ",AN,", No of responders= ",A," (",AT,"%), non responders=",AN-A," (",100-AT,"%)")
+      } else {
+        foo$colz = foo$col2
+        tex <- paste0("Treated patients \n N= ",AN,", No of responders= ",AN-A," (",100-AT,"%), non responders=",A," (",AT,"%)")
+      }
+      
+      
+      
+      
+      
       plot(foo$foo, main=tex, 
            ylab= "follow up - baseline", xlab="Individual subjects order by observed response", 
            xlim=c(0, xup), ylim=c(mi,ma), #length(trt[,"diff"])
@@ -703,10 +770,27 @@ server <- shinyServer(function(input, output   ) {
       
       if (trt$beta.treatment <  0) {foo$colz = foo$col1} else {foo$colz = foo$col2}
       
-      tex <- "Individual changes in response in treated arm
-           Suggested individual differences due entirely to regression to the mean
-           and random error (within subject and measurement error)"
-      tex <- paste0("Control patients: N= ",CN,", No of responders= ",C," (",CT,"%)")
+      # tex <- "Individual changes in response in treated arm
+      #      Suggested individual differences due entirely to regression to the mean
+      #      and random error (within subject and measurement error)"
+      # tex <- paste0("Control patients: N= ",CN,", No of responders= ",C," (",CT,"%)")
+      
+      
+      # if ( beta.treatment <  0) {
+      #   foo$colz = foo$col1
+      #   tex <- paste0("Control arm: Individual changes against baseline, \nPearson's correlation ",cr,"\n N= ",CN,", No of responders= ",C," (",CT,"%), non responders=",CN-C," (",100-CT,"%)")
+      # } else {
+      #   foo$colz = foo$col2
+      #   tex <- paste0("Control arm: Individual changes against baseline, \nPearson's correlation ",cr,"\n N= ",CN,", No of responders= ",CN-C," (",100-CT,"%), non responders=",CN," (",100-CT,"%)")
+      # }
+      # 
+      if ( beta.treatment <  0) {foo$colz = foo$col1
+      tex <- paste0("Control patients \n N= ",CN,", No of responders= ",C," (",CT,"%), non responders=",CN-C," (",100-CT,"%)")
+      } else {
+        foo$colz = foo$col2
+        tex <- paste0("Control patients \n N= ",CN,", No of responders= ",CN-C," (",100-CT,"%), non responders=",C," (",CT,"%)") 
+      }
+      
       plot(foo$foo, main=tex,
            ylab= "follow up - baseline", xlab="Individual subjects order by observed response", 
            xlim=c(0, xup), ylim=c(mi,ma), #length(trt[,"diff"])
@@ -739,6 +823,16 @@ server <- shinyServer(function(input, output   ) {
       trt$col1 =   ifelse(trt$diff <  (sample$trt), "blue" , "black")         
       trt$col2 =   ifelse(trt$diff >  (sample$trt), "blue" , "black")           
       
+      if ( beta.treatment <  0) {
+        foo$colz = foo$col1
+        tex <- paste0("Treatment arm: Individual changes against baseline, \nPearson's correlation ",cr,"\n N= ",AN,", No of responders= ",A," (",AT,"%), non responders=",AN-A," (",100-AT,"%)")
+      } else {
+        foo$colz = foo$col2
+        tex <- paste0("Treatment arm: Individual changes against baseline, \nPearson's correlation ",cr,"\n N= ",AN,", No of responders= ",AN-A," (",100-AT,"%), non responders=",A," (",AT,"%)")
+      }
+      
+      
+      
       with(trt, plot(diff ~  y.0observed,
                      
                      col=  ifelse(beta.treatment <=  0, trt$col1 , 
@@ -748,7 +842,10 @@ server <- shinyServer(function(input, output   ) {
                      pch=16
                      , xlab="observed baseline",  ylab="follow up - baseline"  ,
                      
-                     main=paste0("Treatment arm: observed responders in blue\nPearson's correlation ",cr),
+                     main=tex, #paste0("Treatment arm: observed responders in blue\nPearson's correlation ",cr),
+                     
+                 
+                     
                      
                      cex.main =1.25,
                      ylim=c(mi,ma), xlim=c(mix,max) ))
@@ -769,6 +866,14 @@ server <- shinyServer(function(input, output   ) {
       ctr$col1 =   ifelse(ctr$diff <  (sample$trt), "blue" , "black")         
       ctr$col2 =   ifelse(ctr$diff >  (sample$trt), "blue" , "black")   
       
+      if ( beta.treatment <  0) {
+        foo$colz = foo$col1
+        tex <- paste0("Control arm: Individual changes against baseline, \nPearson's correlation ",cr,"\n N= ",CN,", No of responders= ",C," (",CT,"%), non responders=",CN-C," (",100-CT,"%)")
+      } else {
+        foo$colz = foo$col2
+        tex <- paste0("Control arm: Individual changes against baseline, \nPearson's correlation ",cr,"\n N= ",CN,", No of responders= ",CN-C," (",100-CT,"%), non responders=",CN," (",100-CT,"%)")
+      }
+      
       with(ctr, plot(diff ~  y.0observed, 
                      
                      col=  ifelse(beta.treatment <=  0, ctr$col1 , 
@@ -777,7 +882,7 @@ server <- shinyServer(function(input, output   ) {
                      pch=16
                      , xlab="observed baseline",  ylab="follow up - baseline"  ,
                      
-                     main=paste0("Treatment arm: observed responders in blue\nPearson's correlation ",cr),
+                     main=tex, #paste0("Treatment arm: observed responders in blue\nPearson's correlation ",cr),
                      
                      cex.main =1.25,
                      ylim=c(mi,ma), xlim=c(mix,max) ))
@@ -797,7 +902,7 @@ server <- shinyServer(function(input, output   ) {
     output$reg.plot4 <- renderPlot({         
       
       trial <- make.data()$trial
-      sample <- random.sample()
+       sample <- random.sample()
       N <- make.data()$N
       
       
@@ -816,68 +921,67 @@ server <- shinyServer(function(input, output   ) {
       C.SENN =stats()$C.SENN
       TC.SENN =stats()$TC.SENN
       CT.SENN =stats()$CT.SENN
-      # ---------------------------------------------------------------------------
-      par(mfrow=c(1,2))
+     
       
+     
+
       xup <-  max(table(trial$treat))  # new
-      
+
       trt <- trial[trial$treat==1,]
       trt$diff <- trt$y.1observed - trt$y.0observed
-      
+
       foo <- sort(trt[,"diff"])
-      
+
       foo <- data.frame(foo, col1=NA, col2=NA)
-      
-      foo$col1 =   ifelse(foo$foo <=    sample$SENN, "blue" , "black")         
-      foo$col2 =   ifelse(foo$foo >     sample$SENN, "blue" , "black")   
-      
+
+      foo$col1 =   ifelse(foo$foo <=    sample$SENN, "blue" , "black")
+      foo$col2 =   ifelse(foo$foo >     sample$SENN, "blue" , "black")
+
       if ( sample$SENN <  0) {foo$colz = foo$col1
       tex <- paste0("Treated patients \n N= ",AN,", No of responders= ",T.SENN," (",TC.SENN,"%), non responders=",AN-T.SENN," (",100-TC.SENN,"%)")
       } else {
         foo$colz = foo$col2
       tex <- paste0("Treated patients \n N= ",AN,", No of responders= ",AN-T.SENN," (",100-TC.SENN,"%), non responders=",AN-T.SENN," (",TC.SENN,"%)")
       }
-      
+      par(mfrow=c(1,2))
       plot(foo$foo, main=tex,
-           ylab= "follow up - baseline", xlab="Individual subjects ordered by observed response", 
+           ylab= "follow up - baseline", xlab="Individual subjects ordered by observed response",
            xlim=c(0, xup), ylim=c(mi,ma), #length(trt[,"diff"])
            col=  foo$colz)
       grid(nx = NULL, ny = NULL, col = "lightgray", lty = "dotted")
-     
+
       abline(h=0)
       abline(h=input$trt, lty=2)
       abline(h=input$senn, lty=2, col="blue")
 
       # ---------------------------------------------------------------------------
-      
+
       trt <- trial[trial$treat==0,]
       trt$diff <- trt$y.1observed - trt$y.0observed
       foo <- sort(trt[,"diff"])
-      
+
       foo <- data.frame(foo, col1=NA, col2=NA)
-      
-      foo$col1 =   ifelse(foo$foo <=     sample$SENN, "blue" , "black")         
-      foo$col2 =   ifelse(foo$foo >     sample$SENN, "blue" , "black")   
-      
+
+      foo$col1 =   ifelse(foo$foo <=     sample$SENN, "blue" , "black")
+      foo$col2 =   ifelse(foo$foo >     sample$SENN, "blue" , "black")
+
       if ( sample$SENN <  0) {foo$colz = foo$col1
       tex <- paste0("Control patients \n N= ",CN,", No of responders= ",C.SENN," (",CT.SENN,"%), non responders=",CN-C.SENN," (",100-CT.SENN,"%)")
       } else {
         foo$colz = foo$col2
-      tex <- paste0("Control patients \n N= ",CN,", No of responders= ",CN-C.SENN," (",100-CT.SENN,"%), non responders=",CN-C.SENN," (",CT.SENN,"%)") 
+      tex <- paste0("Control patients \n N= ",CN,", No of responders= ",CN-C.SENN," (",100-CT.SENN,"%), non responders=",CN-C.SENN," (",CT.SENN,"%)")
       }
-      
-      
-      
+
       plot(foo$foo, main=tex,
-           ylab= "follow up - baseline", xlab="Individual subjects ordered by observed response", 
+           ylab= "follow up - baseline", xlab="Individual subjects ordered by observed response",
            xlim=c(0, xup), ylim=c(mi,ma), #length(trt[,"diff"])
            col=  foo$colz)
       grid(nx = NULL, ny = NULL, col = "lightgray", lty = "dotted")
-      
+
       abline(h=0)
       abline(h=input$trt, lty=2)
       abline(h=input$senn, lty=2, col="blue")
- 
+
       
       par(mfrow=c(1,1))
       # ---------------------------------------------------------------------------
@@ -892,7 +996,7 @@ server <- shinyServer(function(input, output   ) {
       
       noise <-  sample$noise        
       beta.treatment <-  sample$trt   
-      senn <- input$senn
+      senn <- (input$senn)
       
       res <- 1- pnorm( (beta.treatment-senn)/ sqrt(noise^2+noise^2)    )
       res2 <- 1-pnorm( (0-senn)/ sqrt(noise^2+noise^2)    )
@@ -925,9 +1029,7 @@ server <- shinyServer(function(input, output   ) {
       
       
       N <- nrow(trial)
-      
-      
-    #  if (sample$trt < 0) {  # negative treatment effect
+    
       # ---------------------------------------------------------------------------treated
          
           trt <- trial[trial$treat==1,]
@@ -937,7 +1039,7 @@ server <- shinyServer(function(input, output   ) {
           AT <- round(A/length(foo)*100,1)                  # %
           AN <- length(foo)                                 # count
           
-          T.SENN <-   mean(foo < sample$SENN)*length(foo)     # proportion at follow up less than clin relv diff
+          T.SENN <-   mean(foo < sample$SENN)*length(foo)   # proportion at follow up less than clin rel diff
           TC.SENN <- round(T.SENN/length(foo)*100,1)        # %
           # ---------------------------------------------------------------------------ctrl
           trt <- trial[trial$treat==0,]                     # same for ctrl
@@ -951,11 +1053,11 @@ server <- shinyServer(function(input, output   ) {
           CT.SENN <- round(C.SENN/length(foo)*100,1)
       
   
-      Z <- data.frame(AN=AN, A=A, AT=AT, CN=CN, C=C, CT= CT)
-      names(Z) <- c("N trt","Observed responders trt",  "%" , "N ctrl","Observed responders ctrl" , "%")
-      rownames(Z) <- NULL
+      # Z <- data.frame(AN=AN, A=A, AT=AT, CN=CN, C=C, CT= CT)
+      # names(Z) <- c("N trt","Observed responders trt",  "%" , "N ctrl","Observed responders ctrl" , "%")
+      # rownames(Z) <- NULL
       # ---------------------------------------------------------------------------
-      return(list(A=A, AT=AT, C=C, CT= CT, Z=Z, AN=AN, CN=CN, T.SENN=T.SENN, TC.SENN=TC.SENN, 
+      return(list(A=A, AT=AT, C=C, CT= CT,  AN=AN, CN=CN, T.SENN=T.SENN, TC.SENN=TC.SENN, #Z=Z,
                   C.SENN=C.SENN , CT.SENN=CT.SENN)) 
       
     })
