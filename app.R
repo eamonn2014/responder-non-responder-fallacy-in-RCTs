@@ -118,6 +118,12 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                             sliderInput("trt",
                                         h5("Treatment effect"),
                                         min=-10, max=10, step=.1, value=-2.5, ticks=FALSE),
+
+
+                            sliderInput("noise",
+                                        h5("Random noise"),
+                                        min=0, max=4, step=.2, value=1, ticks=FALSE),
+
                             
                             sliderInput("pop_mu",
                                         h5("Population mean"),
@@ -126,11 +132,7 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                             sliderInput("pop_sd",
                                         h5("Population sd"),
                                         min=1, max=10, step=1, value=8, ticks=FALSE),
-                            
-                            sliderInput("noise",
-                                        h5("Random noise"),
-                                        min=0, max=4, step=.2, value=1, ticks=FALSE),
-                            
+
                             
                             sliderInput("eligible",
                                         h5("Eligible, if patient is > this many SDs from population mean "),
@@ -233,7 +235,7 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                             
                             
                             tabPanel("Analyse the variance!", value=6, 
-                                                          h4("Fisher in a letter on this topic in 1938 said to look at the variance in the outcome [3]. 
+                                                          h4("Fisher in a letter on this topic in 1938 said to look at the variance in the outcome (suggesting an increase variance in the treated group) [3]. 
                                         Is there any evidence against the null hypothesis that the variance in the outcome in the trial arms differ? 
                                         The P-Value testing this hypothesis will for the vast majority of the time not reject the null hypothesis.  
                                         This is what we expect, given that the true magnitude of response in the simulation is constant for all 
@@ -310,9 +312,9 @@ server <- shinyServer(function(input, output   ) {
         n <-      pop
         noise <-  input$noise     
         eligible <- input$eligible  
-        SENN <- input$senn
+       # SENN <- input$senn
         
-        return(list( n=n ,  trt=trt , mu=mu, sd=sd, noise=noise, eligible=eligible, power=power, alpha=alpha, SENN =SENN )) 
+        return(list( n=n ,  trt=trt , mu=mu, sd=sd, noise=noise, eligible=eligible, power=power, alpha=alpha))#, SENN =SENN )) 
         
     })
   
@@ -345,7 +347,8 @@ server <- shinyServer(function(input, output   ) {
                                  sig.level= alpha, power= power,
                                  type="two.sample", alternative=c("two.sided"))$n*2)
         
-
+        treat <- 1*(runif(n)<.5)                             # random treatment allocation
+        
         # to avoid floating point errors add small amount to reponders are counted as responders when  noise sd =0 only
         if (noise==0) {
           
@@ -367,7 +370,6 @@ server <- shinyServer(function(input, output   ) {
         y.0true <- rnorm(n, pop_mu, pop_sd)                  # true baseline
         y.0observed <- y.0true + rnorm(n, 0, 1*noise)        # observed baseline 
         
-        treat <- 1*(runif(n)<.5)                             # random treatment allocation
         y.1true <- y.0true + (treat*beta.treatment)          # true follow up, treated only respond
         
         
@@ -735,10 +737,10 @@ server <- shinyServer(function(input, output   ) {
       
       if ( beta.treatment <  0) {
         foo$colz = foo$col1
-        tex <- paste0("Treated patients \n N= ",AN,", No of responders= ",A," (",AT,"%), non responders=",AN-A," (",100-AT,"%)")
+        tex <- paste0("Treated patients, responders coloured blue \n N= ",AN,", No of responders= ",A," (",AT,"%), non responders=",AN-A," (",100-AT,"%)")
       } else {
         foo$colz = foo$col2
-        tex <- paste0("Treated patients \n N= ",AN,", No of responders= ",AN-A," (",100-AT,"%), non responders=",A," (",AT,"%)")
+        tex <- paste0("Treated patients, responders coloured blue \n N= ",AN,", No of responders= ",AN-A," (",100-AT,"%), non responders=",A," (",AT,"%)")
       }
       
       
@@ -754,6 +756,8 @@ server <- shinyServer(function(input, output   ) {
       with(trt, abline(v=A, col="black", lty="dashed"))
       with(trt, abline(h=0, col="black", lty=1))
       with(trt, abline(h=(beta.treatment), col=c("forestgreen"), lty=c(2), lwd=c(1) ) )
+    
+            
       # ---------------------------------------------------------------------------
       
       
@@ -785,10 +789,10 @@ server <- shinyServer(function(input, output   ) {
       # }
       # 
       if ( beta.treatment <  0) {foo$colz = foo$col1
-      tex <- paste0("Control patients \n N= ",CN,", No of responders= ",C," (",CT,"%), non responders=",CN-C," (",100-CT,"%)")
+      tex <- paste0("Control patients, responders coloured blue\n N= ",CN,", No of responders= ",C," (",CT,"%), non responders=",CN-C," (",100-CT,"%)")
       } else {
         foo$colz = foo$col2
-        tex <- paste0("Control patients \n N= ",CN,", No of responders= ",CN-C," (",100-CT,"%), non responders=",C," (",CT,"%)") 
+        tex <- paste0("Control patients, responders coloured blue\n N= ",CN,", No of responders= ",CN-C," (",100-CT,"%), non responders=",C," (",CT,"%)") 
       }
       
       plot(foo$foo, main=tex,
@@ -800,6 +804,7 @@ server <- shinyServer(function(input, output   ) {
       with(trt, abline(v=C, col="black", lty="dashed"))
       with(trt, abline(h=0, col="black", lty=1))
       with(trt, abline(h=(beta.treatment), col=c("forestgreen"), lty=c(2), lwd=c(1) ) )
+      
       #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       trial <- make.data()$trial
       
@@ -934,10 +939,10 @@ server <- shinyServer(function(input, output   ) {
 
       foo <- data.frame(foo, col1=NA, col2=NA)
 
-      foo$col1 =   ifelse(foo$foo <=    sample$SENN, "blue" , "black")
-      foo$col2 =   ifelse(foo$foo >     sample$SENN, "blue" , "black")
+      foo$col1 =   ifelse(foo$foo <=    input$senn, "blue" , "black")
+      foo$col2 =   ifelse(foo$foo >     input$senn, "blue" , "black")
 
-      if ( sample$SENN <  0) {foo$colz = foo$col1
+      if ( input$senn <  0) {foo$colz = foo$col1
       tex <- paste0("Treated patients \n N= ",AN,", No of responders= ",T.SENN," (",TC.SENN,"%), non responders=",AN-T.SENN," (",100-TC.SENN,"%)")
       } else {
         foo$colz = foo$col2
@@ -953,7 +958,10 @@ server <- shinyServer(function(input, output   ) {
       abline(h=0)
       abline(h=input$trt, lty=2)
       abline(h=input$senn, lty=2, col="blue")
-
+      title(main = "", sub = "Patients observed to respond coloured blue, otherwise black; blue dashed line denotes clincal relevant difference, black dashed line the true trt effect in treated only",  
+            adj=0,cex.sub = 0.75, font.sub = 1, col.sub = "black"
+            
+      )
       # ---------------------------------------------------------------------------
 
       trt <- trial[trial$treat==0,]
@@ -962,10 +970,10 @@ server <- shinyServer(function(input, output   ) {
 
       foo <- data.frame(foo, col1=NA, col2=NA)
 
-      foo$col1 =   ifelse(foo$foo <=     sample$SENN, "blue" , "black")
-      foo$col2 =   ifelse(foo$foo >     sample$SENN, "blue" , "black")
+      foo$col1 =   ifelse(foo$foo <=     input$senn, "blue" , "black")
+      foo$col2 =   ifelse(foo$foo >     input$senn, "blue" , "black")
 
-      if ( sample$SENN <  0) {foo$colz = foo$col1
+      if ( input$senn <  0) {foo$colz = foo$col1
       tex <- paste0("Control patients \n N= ",CN,", No of responders= ",C.SENN," (",CT.SENN,"%), non responders=",CN-C.SENN," (",100-CT.SENN,"%)")
       } else {
         foo$colz = foo$col2
@@ -981,7 +989,10 @@ server <- shinyServer(function(input, output   ) {
       abline(h=0)
       abline(h=input$trt, lty=2)
       abline(h=input$senn, lty=2, col="blue")
-
+      title(main = "", sub = "Patients observed to respond coloured blue, otherwise black; blue dashed line denotes clincal relevant difference, black dashed line the true trt effect in treated only",  
+            adj=0,cex.sub = 0.75, font.sub = 1, col.sub = "black"
+            
+      )
       
       par(mfrow=c(1,1))
       # ---------------------------------------------------------------------------
@@ -1039,7 +1050,7 @@ server <- shinyServer(function(input, output   ) {
           AT <- round(A/length(foo)*100,1)                  # %
           AN <- length(foo)                                 # count
           
-          T.SENN <-   mean(foo < sample$SENN)*length(foo)   # proportion at follow up less than clin rel diff
+          T.SENN <-   mean(foo < input$senn)*length(foo)   # proportion at follow up less than clin rel diff
           TC.SENN <- round(T.SENN/length(foo)*100,1)        # %
           # ---------------------------------------------------------------------------ctrl
           trt <- trial[trial$treat==0,]                     # same for ctrl
@@ -1049,7 +1060,7 @@ server <- shinyServer(function(input, output   ) {
           CT <- round(C/length(foo)*100,1)
           CN = length(foo)
           
-          C.SENN <- mean(foo < sample$SENN)*length(foo)
+          C.SENN <- mean(foo < input$senn)*length(foo)
           CT.SENN <- round(C.SENN/length(foo)*100,1)
       
   
