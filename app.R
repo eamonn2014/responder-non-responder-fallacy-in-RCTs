@@ -88,7 +88,8 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                         few patients have large changes, most small changes. 
                         The third tab shows the treatment effect by baseline values. Typically we see a negative correlation. 
                         The fourth tab presents plots from the previous two tabs together. 
-                        The fifth tab reproduces via simulation a Stephen Senn example [2].
+                        The fifth tab presents an approach to assess the potential for different treatment responses in the trial arm.
+                        The sixth tab reproduces via simulation a Stephen Senn example [2].
                         Lastly, a listing of the data is presented."),
                         div(
                             
@@ -183,7 +184,7 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
 
                    ")),
                             
-                            tabPanel("ANCOVA", value=6, 
+                            tabPanel("1 ANCOVA", value=6, 
                                      # h4("Modelling"),
                                      h4("First we show the preferred approach, estimate the treatment effect with a linear model."),
                                      
@@ -199,7 +200,7 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                                      h4("Figure 1 ANCOVA model estimating the treatment effect 'treat' whilst adjusting for baseline version of outcome, right panel is a plot of estimated treatment effect, represented by the distance between the parallel lines"),
                             ) ,
                             #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~end of section to add colour     
-                            tabPanel("Plot change in order of magnitude", 
+                            tabPanel("2 Plot change in order of magnitude", 
                                      #    h2("Plotting the data"),
                                      div(plotOutput("reg.plot1", width=fig.width, height=fig.height)),  
                                      h4("Figure 2 Observed change in each patient in order of magnitude, blue observed 'responders'. Treated (left) and control arm (right)."),
@@ -223,7 +224,7 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                                 
                             ) ,
                             #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                            tabPanel("Plot individual change against baseline",
+                            tabPanel("3 Plot change against baseline",
                                      #h4("Fxxxxxxxxxxxxxxxxxxxxxxxxxxxx"),
                                      div(plotOutput("res.plot2", width=fig.width, height=fig.height)),  
                                      h4("Figure 3 Observed individual changes plotted against baseline, treated (left) and control (right) arms."),         
@@ -236,7 +237,7 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                             ),
                             
                             #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                            tabPanel("All plots together", value=3, 
+                            tabPanel("4 All plots together", value=3, 
                                     #  h4("xxxxxxxxxxxxxxxxxx"),#
                                      #h6("xxxxxxxxxxxxxxxxxx."),
                                      div(plotOutput("res.plot3", width=fig.width2, height=fig.height2)), 
@@ -247,7 +248,7 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                       
                             
                             
-                            tabPanel("Analyse the variance!", value=6, 
+                            tabPanel("5 Analyse the variance!", value=6, 
                                                           h4("Fisher in a letter on this topic in 1938 said to look at the variance in the outcome (suggesting an increase variance in the treated group) [3]. 
                                         Is there any evidence against the null hypothesis that the variance in the outcome in the trial arms differ? 
                                         The P-Value testing this hypothesis will for the vast majority of the time not reject the null hypothesis.  
@@ -262,7 +263,7 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                             ) ,
                             
                             #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                            tabPanel("Clinical relevant difference", 
+                            tabPanel("6 Clinical relevant difference", 
                                      div(plotOutput("reg.plot4", width=fig.width, height=fig.height)), 
                                      h4("Figure 5 Observed individual changes plotted against baseline, treated (left) and control (right) arms incorporating a clinical relevant difference."),         
                                      
@@ -294,7 +295,7 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                                      
                             ) ,
                             #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                            tabPanel("Data", value=3, 
+                            tabPanel("7 Data", value=3, 
                                      DT::dataTableOutput("table1"),
                                      
                             ) 
