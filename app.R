@@ -200,6 +200,7 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                                      
                                      p(strong("Apparent individual difference is due **ENTIRELY** to random within subject error,
                                               measurement error and regression to the mean. Slide the 'Random noise' to zero to see.")),
+                                     p(strong("The crux of the problem, focus on the left panel. How do you predict the order of the patients? Ans: you cannot, it is random.")),
                                      
                                 
                             ) ,
@@ -372,8 +373,6 @@ server <- shinyServer(function(input, output   ) {
         
         y.1true <- y.0true + (treat*beta.treatment)          # true follow up, treated only respond
         
-        
-        
         ##################################################################
         
         y.1observed <- y.1true + rnorm(n, 0, 1*noise)        # observed follow up, noise added 
@@ -382,48 +381,7 @@ server <- shinyServer(function(input, output   ) {
         }
         
         eligible <- ifelse(y.0observed > ur.eligible*(pop_mu+pop_sd), 1, 0)  # x sds away from pop mu eligible for trial
-        
-        ##get around the floating point errors############################
-        ##################################################################
-        
-        # floating point errors were apparant when noise was set to 0
-        # as there should 100% - 0% but that was not observed, here I try to 
-        # circumevent the errors.
-   
-        
-      #   tol <-  0.99999999999
-      #   x <-y.1true - y.0true
-      # # print(x, digits=16) 
-      #   fp.err <- which((x > tol) & (x <1) )  # find float point errors
-      # #  fp.err           
-      #   # 'correct' fp errors, duplicate the values in y.1true and y.0true 
-      #   J <- length(fp.err)
-      #   
-      #   for (i in 1:J) {
-      #     
-      #     x <- fp.err[i]
-      #     y.1true[x] <- y.0true[x]  # random swap, y0 could be 1 more or one less than y1
-      #     treat[x] <-1
-      #   }
-         
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-      #  table(y.1true - y.0true) 
-        
+
         ##################################################################
     # diff for baseline
         
@@ -614,6 +572,9 @@ server <- shinyServer(function(input, output   ) {
       cr$conf.int[1:2]
       cr <- paste0( p2(cr$estimate),", 95%CI (",p2(cr$conf.int[1]),", " ,p2(cr$conf.int[2]), " )")
       
+      # Due to floating point arithmetic we will the values will slightly differ and will get a val so setting this to NA
+      if (input$noise==0) {  cr <- "NA, 95%CI (NA, NA)"  }
+  
       trt$col1 =   ifelse(trt$diff <=  (sample$trt), "blue" , "black")         
       trt$col2 =   ifelse(trt$diff >  (sample$trt), "blue" , "black")           
       
@@ -635,9 +596,8 @@ server <- shinyServer(function(input, output   ) {
                      pch=16
                      , xlab="observed baseline",  ylab="follow up - baseline"  ,
                      main=tex,
-                     
-                     , cex.main =1.25,
-                     ylim=c(mi,ma), xlim=c(mix,max) ))
+                       cex.main =1.25,
+                     ylim=c(mi,ma), xlim=c(mix,max) )) 
       
       with(trt, abline(lm(diff ~  y.0observed), col=c("red"), lty=c(1), lwd=c(2) ) )
       with(trt, abline(h=mean(beta.treatment), col=c("forestgreen"), lty="dashed", lwd=c(2) ) )
@@ -653,6 +613,9 @@ server <- shinyServer(function(input, output   ) {
       cr$estimate[1][[1]]
       cr$conf.int[1:2]
       cr <- paste0( p2(cr$estimate),", 95%CI (",p2(cr$conf.int[1]),", " ,p2(cr$conf.int[2]), " )")
+      
+      # Due to floating point arithmetic we will the values will slightly differ and will get a val so setting this to NA
+      if (input$noise==0) {  cr <- "NA, 95%CI (NA, NA)"  }
       
       ctr$col1 =   ifelse(ctr$diff <=  (sample$trt), "blue" , "black")         
       ctr$col2 =   ifelse(ctr$diff >  (sample$trt), "blue" , "black")   
@@ -673,7 +636,7 @@ server <- shinyServer(function(input, output   ) {
                      , xlab="observed baseline",  ylab="follow up - baseline"  ,
                      main=tex, #paste0("Control arm:  Individual changes against baseline, observed responders in blue\nPearson's correlation ",cr
                                 # , "; control patients \n N= ",CN,", No of responders= ",C," (",CT,"%)")
-                     , cex.main =1.25,
+                     cex.main =1.25,
                      ylim=c(mi,ma), xlim=c(mix,max) ) ) 
       
       
@@ -825,6 +788,9 @@ server <- shinyServer(function(input, output   ) {
       cr$conf.int[1:2]
       cr <- paste0( p2(cr$estimate),", 95%CI (",p2(cr$conf.int[1]),", " ,p2(cr$conf.int[2]), " )")
       
+      # Due to floating point arithmetic we will the values will slightly differ and will get a val so setting this to NA
+      if (input$noise==0) {  cr <- "NA, 95%CI (NA, NA)"  }
+      
       trt$col1 =   ifelse(trt$diff <  (sample$trt), "blue" , "black")         
       trt$col2 =   ifelse(trt$diff >  (sample$trt), "blue" , "black")           
       
@@ -867,6 +833,9 @@ server <- shinyServer(function(input, output   ) {
       cr$estimate[1][[1]]
       cr$conf.int[1:2]
       cr <- paste0( p2(cr$estimate),", 95%CI (",p2(cr$conf.int[1]),", " ,p2(cr$conf.int[2]), " )")
+      
+      # Due to floating point arithmetic we will the values will slightly differ and will get a val so setting this to NA
+      if (input$noise==0) {  cr <- "NA, 95%CI (NA, NA)"  }
       
       ctr$col1 =   ifelse(ctr$diff <  (sample$trt), "blue" , "black")         
       ctr$col2 =   ifelse(ctr$diff >  (sample$trt), "blue" , "black")   
