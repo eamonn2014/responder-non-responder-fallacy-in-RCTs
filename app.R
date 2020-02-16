@@ -200,7 +200,7 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                                      
                                      p(strong("Apparent individual difference is due **ENTIRELY** to random within subject error,
                                               measurement error and regression to the mean. Slide the 'Random noise' to zero to see.")),
-                                     p(strong("The crux of the problem, focus on the left panel. How do you predict the order of the patients? Ans: you cannot, it is random.")),
+                                     p(strong("The crux of the problem, focus on the left panel. How do you predict the order of the patients? You cannot, it is random.")),
                                      
                                 
                             ) ,
@@ -208,7 +208,7 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                             tabPanel("Plot individual change against baseline",
                                      #h4("Fxxxxxxxxxxxxxxxxxxxxxxxxxxxx"),
                                      div(plotOutput("res.plot2", width=fig.width, height=fig.height)),  
-                                     h4("Figure 2 Observed individual changes plotted against baseline, treated (left) and control (right) arms. "),         
+                                     h4("Figure 2 Observed individual changes plotted against baseline, treated (left) and control (right) arms."),         
                                      
                                      
                                      p(strong("The negative slope often seen in this type of plot can be due entirely to regression to the mean. Patients with a relatively high measured value
@@ -226,7 +226,7 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                                         Bottom planels show observed response by baseline in treated (left) and control (right) arms. "),         
                             ) ,
                             #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                            tabPanel("ANCOVA model", value=6, 
+                            tabPanel("ANCOVA", value=6, 
                                     # h4("Modelling"),
                                      h4("Here we estimate the treatment effect with a linear model."),
                                    div( verbatimTextOutput("reg.summary2")),
@@ -547,14 +547,16 @@ server <- shinyServer(function(input, output   ) {
       sample <- random.sample()
       beta.treatment <-  sample$trt 
       trial <- make.data()$trial
-      
       stats <- stats()
+      
       A=stats()$A
       AT=stats()$AT 
       C=stats()$C    
       CT=stats()$CT
       AN=stats()$AN
       CN=stats()$CN
+      
+      
       diff <- trial$y.1observed - trial$y.0observed
       mi <-  min( diff)*1.2
       ma <-  max(diff)*1.2
@@ -563,7 +565,7 @@ server <- shinyServer(function(input, output   ) {
       mix <-  min( x) 
       max <-  max(x) 
       
-      
+      #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       trt <- trial[trial$treat==1,]
       trt$diff <- trt$y.1observed - trt$y.0observed
       
@@ -572,18 +574,18 @@ server <- shinyServer(function(input, output   ) {
       cr$conf.int[1:2]
       cr <- paste0( p2(cr$estimate),", 95%CI (",p2(cr$conf.int[1]),", " ,p2(cr$conf.int[2]), " )")
       
-      # Due to floating point arithmetic we will the values will slightly differ and will get a val so setting this to NA
+      # Due to floating point arithmetic we will see the values will slightly differ and will get a val so setting this to NA
       if (input$noise==0) {  cr <- "NA, 95%CI (NA, NA)"  }
   
       trt$col1 =   ifelse(trt$diff <=  (sample$trt), "blue" , "black")         
-      trt$col2 =   ifelse(trt$diff >  (sample$trt), "blue" , "black")           
+      trt$col2 =   ifelse(trt$diff >   (sample$trt), "blue" , "black")           
       
       
       if ( beta.treatment <  0) {
-        foo$colz = foo$col1
+        trt$colz = trt$col1
         tex <- paste0("Treatment arm: Individual changes against baseline, \nPearson's correlation ",cr,"\n N= ",AN,", No of responders= ",A," (",AT,"%), non responders=",AN-A," (",100-AT,"%)")
       } else {
-        foo$colz = foo$col2
+        trt$colz = trt$col2
         tex <- paste0("Treatment arm: Individual changes against baseline, \nPearson's correlation ",cr,"\n N= ",AN,", No of responders= ",AN-A," (",100-AT,"%), non responders=",A," (",AT,"%)")
       }
       
@@ -592,7 +594,8 @@ server <- shinyServer(function(input, output   ) {
       with(trt, plot(diff ~  y.0observed, 
                      
                      col=  ifelse(beta.treatment <  0, trt$col1 , 
-                                  ifelse(beta.treatment >  0, trt$col2 ,    NA )) ,
+                           ifelse(beta.treatment >  0, trt$col2 ,    NA )) ,
+                     
                      pch=16
                      , xlab="observed baseline",  ylab="follow up - baseline"  ,
                      main=tex,
@@ -614,24 +617,24 @@ server <- shinyServer(function(input, output   ) {
       cr$conf.int[1:2]
       cr <- paste0( p2(cr$estimate),", 95%CI (",p2(cr$conf.int[1]),", " ,p2(cr$conf.int[2]), " )")
       
-      # Due to floating point arithmetic we will the values will slightly differ and will get a val so setting this to NA
+      # Due to floating point arithmetic we will see the values will slightly differ and will get a val so setting this to NA
       if (input$noise==0) {  cr <- "NA, 95%CI (NA, NA)"  }
       
       ctr$col1 =   ifelse(ctr$diff <=  (sample$trt), "blue" , "black")         
       ctr$col2 =   ifelse(ctr$diff >  (sample$trt), "blue" , "black")   
       
       if ( beta.treatment <  0) {
-        foo$colz = foo$col1
+        ctr$colz = ctr$col1
         tex <- paste0("Control arm: Individual changes against baseline, \nPearson's correlation ",cr,"\n N= ",CN,", No of responders= ",C," (",CT,"%), non responders=",CN-C," (",100-CT,"%)")
       } else {
-        foo$colz = foo$col2
+        ctr$colz = ctr$col2
         tex <- paste0("Control arm: Individual changes against baseline, \nPearson's correlation ",cr,"\n N= ",CN,", No of responders= ",CN-C," (",100-CT,"%), non responders=",CN," (",100-CT,"%)")
       }
       
       
       with(ctr, plot(diff ~  y.0observed, 
                      col=  ifelse(beta.treatment <  0, ctr$col1 , 
-                                  ifelse(beta.treatment >  0, ctr$col2 ,    NA )) ,
+                           ifelse(beta.treatment >  0, ctr$col2 ,    NA )) ,
                      pch=16
                      , xlab="observed baseline",  ylab="follow up - baseline"  ,
                      main=tex, #paste0("Control arm:  Individual changes against baseline, observed responders in blue\nPearson's correlation ",cr
@@ -732,25 +735,12 @@ server <- shinyServer(function(input, output   ) {
       
       foo <- data.frame(foo, col1=NA, col2=NA)
       
-      foo$col1 =   ifelse(foo$foo <=    trt$beta.treatment, "blue" , "black")         
+      foo$col1 =   ifelse(foo$foo <=    trt$beta.treatment, "blue" , "black")          
       foo$col2 =   ifelse(foo$foo >    trt$beta.treatment, "blue" , "black")   
       
-      if (trt$beta.treatment <  0) {foo$colz = foo$col1} else {foo$colz = foo$col2}
+      #if (trt$beta.treatment <  0) {foo$colz = foo$col1} else {foo$colz = foo$col2}
       
-      # tex <- "Individual changes in response in treated arm
-      #      Suggested individual differences due entirely to regression to the mean
-      #      and random error (within subject and measurement error)"
-      # tex <- paste0("Control patients: N= ",CN,", No of responders= ",C," (",CT,"%)")
-      
-      
-      # if ( beta.treatment <  0) {
-      #   foo$colz = foo$col1
-      #   tex <- paste0("Control arm: Individual changes against baseline, \nPearson's correlation ",cr,"\n N= ",CN,", No of responders= ",C," (",CT,"%), non responders=",CN-C," (",100-CT,"%)")
-      # } else {
-      #   foo$colz = foo$col2
-      #   tex <- paste0("Control arm: Individual changes against baseline, \nPearson's correlation ",cr,"\n N= ",CN,", No of responders= ",CN-C," (",100-CT,"%), non responders=",CN," (",100-CT,"%)")
-      # }
-      # 
+ 
       if ( beta.treatment <  0) {foo$colz = foo$col1
       tex <- paste0("Control patients, responders coloured blue\n N= ",CN,", No of responders= ",C," (",CT,"%), non responders=",CN-C," (",100-CT,"%)")
       } else {
