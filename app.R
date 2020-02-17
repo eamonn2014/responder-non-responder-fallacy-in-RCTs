@@ -174,7 +174,7 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                                      fluidRow(
                                        column(width = 5,
                                               div( verbatimTextOutput("reg.summary2")),
-                                              p(strong("95% CIs")),
+                                              h4("95% CIs"),
                                               div( verbatimTextOutput("reg.summary3"))
                                        ), 
                                        column(width = 5,
@@ -669,7 +669,7 @@ server <- shinyServer(function(input, output   ) {
       abline(h=0, lwd=c(1))
       with(ctr, abline(h=(beta.treatment), col=c("forestgreen"), lty="dashed",  lwd=c(2) ))
       
-      title(main = "", sub = "Red dashed line is linear regression line of best fit.",  
+      title(main = "", sub = "Red line is linear regression line of best fit.",  
             adj=0,cex.sub = 0.75, font.sub = 1, col.sub = "black")
       
       par(mfrow=c(1,1))
