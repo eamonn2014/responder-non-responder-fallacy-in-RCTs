@@ -9,7 +9,7 @@
   library(tidyverse)
   library(shinyWidgets)
   library(shinythemes)  # more funky looking apps
-  
+ # library(shinydashboard)
   options(max.print=1000000)
   fig.width <- 1375
   fig.height <- 550
@@ -27,6 +27,7 @@
   # Always remember that the purpose of a parallel-group randomized trial is to compare the parallel groups, 
   # NOT to look at change from baseline.  Baseline should always be an adjustment covariate (only).
   
+ 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/packages/shinythemes/versions/1.1.2
                 # paper
@@ -248,7 +249,7 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                             #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                             tabPanel("6 Clinical relevant difference", 
                                      div(plotOutput("reg.plot4", width=fig.width, height=fig.height)), 
-                                     h4("Figure 5 Observed individual changes plotted against baseline, treated (left) and control (right) arms incorporating a clinical relevant difference."),         
+                                     h4("Figure 5 Observed change in each patient in order of magnitude, blue observed 'responders'. Treated (left) and control arm (right), incorporating a clinical relevant difference."),         
                                      
                                      fluidRow(
                                        column(12,
