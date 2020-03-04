@@ -143,6 +143,11 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                              div(p(" ")),
                           tags$a(href = "https://www.nature.com/magazine-assets/d41586-018-07535-2/d41586-018-07535-2.pdf", "[6] Statistical pitfalls of personalized medicine"),
                           div(p(" ")),
+                          tags$a(href = "http://shiny-eio.upc.edu/pubs/F1000_precision_medicine/", "[7] A similar app"),
+                          div(p(" ")),
+
+
+
                         )
                           
                    ),
