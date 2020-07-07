@@ -65,9 +65,20 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                         The next slider imposes, if desired,
                         an inclusion criteria based on the response distribution. All scenarios have 99% power with alpha 1% to pick up the treatment effect."),
                      
+                     # actionButton(inputId='ab1', label="R code",   icon = icon("th"), 
+                     #              onclick ="window.open('https://raw.githubusercontent.com/eamonn2014/responder-non-responder-fallacy-in-RCTs/master/app.R', '_blank')"),    
+                     # actionButton("resample", "Simulate a new sample"),
+                     # 
+                     
+                     
+                     actionButton(inputId='ab1', label="Shiny",   icon = icon("th"), 
+                                  onclick ="window.open('https://raw.githubusercontent.com/eamonn2014/responder-non-responder-fallacy-in-RCTs/master/app.R', '_blank')"),   
                      actionButton(inputId='ab1', label="R code",   icon = icon("th"), 
-                                  onclick ="window.open('https://raw.githubusercontent.com/eamonn2014/responder-non-responder-fallacy-in-RCTs/master/app.R', '_blank')"),    
+                                  onclick ="window.open('https://raw.githubusercontent.com/eamonn2014/responder-non-responder-fallacy-in-RCTs/master/Rcode.R', '_blank')"),   
                      actionButton("resample", "Simulate a new sample"),
+                     
+                     
+                     
                      br(), # br(),
                      tags$style(".well {background-color:#b6aebd ;}"), ##ABB0B4AF
                      
