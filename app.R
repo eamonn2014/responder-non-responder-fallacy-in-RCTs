@@ -1229,9 +1229,14 @@ server <- shinyServer(function(input, output   ) {
                       scroller = T
                    ))  %>%
           
-             formatRound(
-                 columns= namez,   
-                            digits=c(2,2,0,0,1,2,2,2)  )
+          formatRound(
+            columns= c("true baseline","observed baseline", "true treatment effect\n in treated only","
+                  true response","observed response","delta observed"), 
+            digits=4 )
+          
+             # formatRound(
+             #     columns= namez,   
+             #                digits=c(2,2,0,0,1,2,2,2)  )
     })
     # --------------------------------------------------------------------------
     # ---------------------------------------------------------------------------
