@@ -144,6 +144,10 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
 
  tags$a(href = "https://www.bmj.com/content/bmj/342/bmj.d561.full.pdf", tags$span(style="color:blue",  "[1] Comparisons within randomised groups can be very misleading"),),
                             div(p(" ")),
+
+
+
+
 tags$a(href = "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC524113/pdf/bmj32900966.pdf", tags$span(style="color:blue", "[2] Individual response to treatment: is it a valid assumption?"),),
                             div(p(" ")),
 tags$a(href = "https://www.youtube.com/watch?v=uiCd9m6tmt0&feature=youtu.be", tags$span(style="color:blue","[3] Professor George Davey Smith - Some constraints on the scope and potential of personalised medicine"),),
@@ -157,7 +161,10 @@ tags$a(href = "https://twitter.com/f2harrell/status/1220700181496320001", tags$s
 tags$a(href = "https://www.nature.com/magazine-assets/d41586-018-07535-2/d41586-018-07535-2.pdf", tags$span(style="color:blue", "[7] Statistical pitfalls of personalized medicine"),),
                           div(p(" ")),
 tags$a(href = "http://shiny-eio.upc.edu/pubs/F1000_precision_medicine/", tags$span(style="color:blue", "[8] A similar app"),),
-                          div(p(" ")),
+div(p(" ")),
+tags$a(href = "https://stats.stackexchange.com/questions/59092/correct-test-for-correlation-between-change-and-baseline-measurement", tags$span(style="color:blue",  "[9] Negative correlation"),),
+div(p(" ")),
+                     
                       
                         )
                           
