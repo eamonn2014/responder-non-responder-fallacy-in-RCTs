@@ -43,8 +43,12 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                 h4("  We perform a simulation of a parallel randomised (1:1) control trial demonstrating one reason why it is wrong to analyse arms 
                 of a trial separately aiming to identify responders and non responders. 'The essential feature of a randomised trial is the comparison between groups. Within group analyses do
                 not address a meaningful question: the question is not whether there
-                is a change from baseline, but whether any change is greater in one group than the other [1].'
-              "), 
+                is a change from baseline, but whether any change is greater in one group than the other [1]. 'The reason we run a large clinical trial with
+many patients is that we need that number
+to tell whether the treatment works at all. It
+is thus not possible to tell at the individual
+level whether the treatment works for a given
+patient' [2]."), 
                 
                 h3("  "), 
                # shinyUI(pageWithSidebar(
@@ -88,7 +92,7 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                         The third tab shows the treatment effect by baseline values. Typically we see a negative correlation. 
                         The fourth tab presents plots from the previous two tabs together. 
                         The fifth tab presents an approach to assess the potential for different treatment responses in the trial arm.
-                        The sixth tab reproduces via simulation a Stephen Senn example [2].
+                        The sixth tab reproduces via simulation a Stephen Senn example [3].
                         Lastly, a listing of the data is presented."),
                         div(
                             
@@ -145,24 +149,25 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
  tags$a(href = "https://www.bmj.com/content/bmj/342/bmj.d561.full.pdf", tags$span(style="color:blue",  "[1] Comparisons within randomised groups can be very misleading"),),
                             div(p(" ")),
 
-
-
-
-tags$a(href = "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC524113/pdf/bmj32900966.pdf", tags$span(style="color:blue", "[2] Individual response to treatment: is it a valid assumption?"),),
-                            div(p(" ")),
-tags$a(href = "https://www.youtube.com/watch?v=uiCd9m6tmt0&feature=youtu.be", tags$span(style="color:blue","[3] Professor George Davey Smith - Some constraints on the scope and potential of personalised medicine"),),
-                            div(p(" ")),
-tags$a(href = "https://onlinelibrary.wiley.com/doi/epdf/10.1002/sim.2074", tags$span(style="color:blue", "[4] Senn quoting fisher"),),
-                              div(p(" ")),
-tags$a(href = "https://physoc.onlinelibrary.wiley.com/doi/epdf/10.1113/EP085070", tags$span(style="color:blue", "[5] True and false interindividual differences in the physiological response to an intervention"),),
-                             div(p(" ")),
-tags$a(href = "https://twitter.com/f2harrell/status/1220700181496320001", tags$span(style="color:blue", "[6] Purpose of RCT"),),
-                             div(p(" ")),
-tags$a(href = "https://www.nature.com/magazine-assets/d41586-018-07535-2/d41586-018-07535-2.pdf", tags$span(style="color:blue", "[7] Statistical pitfalls of personalized medicine"),),
-                          div(p(" ")),
-tags$a(href = "http://shiny-eio.upc.edu/pubs/F1000_precision_medicine/", tags$span(style="color:blue", "[8] A similar app"),),
+tags$a(href = "https://journals.sagepub.com/doi/abs/10.1177/009286150103500443", tags$span(style="color:blue", "[2] Individual therapy:New dawn or false dawn? p1487"),),
 div(p(" ")),
-tags$a(href = "https://stats.stackexchange.com/questions/59092/correct-test-for-correlation-between-change-and-baseline-measurement", tags$span(style="color:blue",  "[9] Negative correlation"),),
+
+
+tags$a(href = "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC524113/pdf/bmj32900966.pdf", tags$span(style="color:blue", "[3] Individual response to treatment: is it a valid assumption?"),),
+                            div(p(" ")),
+tags$a(href = "https://www.youtube.com/watch?v=uiCd9m6tmt0&feature=youtu.be", tags$span(style="color:blue","[4] Professor George Davey Smith - Some constraints on the scope and potential of personalised medicine"),),
+                            div(p(" ")),
+tags$a(href = "https://onlinelibrary.wiley.com/doi/epdf/10.1002/sim.2074", tags$span(style="color:blue", "[5] Senn quoting fisher"),),
+                              div(p(" ")),
+tags$a(href = "https://physoc.onlinelibrary.wiley.com/doi/epdf/10.1113/EP085070", tags$span(style="color:blue", "[6] True and false interindividual differences in the physiological response to an intervention"),),
+                             div(p(" ")),
+tags$a(href = "https://twitter.com/f2harrell/status/1220700181496320001", tags$span(style="color:blue", "[7] Purpose of RCT"),),
+                             div(p(" ")),
+tags$a(href = "https://www.nature.com/magazine-assets/d41586-018-07535-2/d41586-018-07535-2.pdf", tags$span(style="color:blue", "[8] Statistical pitfalls of personalized medicine"),),
+                          div(p(" ")),
+tags$a(href = "http://shiny-eio.upc.edu/pubs/F1000_precision_medicine/", tags$span(style="color:blue", "[9] A similar app"),),
+div(p(" ")),
+tags$a(href = "https://stats.stackexchange.com/questions/59092/correct-test-for-correlation-between-change-and-baseline-measurement", tags$span(style="color:blue",  "[10] Why a negative correlation is induced."),),
 div(p(" ")),
                      
                       
@@ -247,10 +252,10 @@ div(p(" ")),
                             ) ,
                             #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                              tabPanel("5 Analyse the variance!", value=6, 
-                                                          h4("Fisher in a letter on this topic in 1938 to Henry Daniels said to look at the variance in the outcome (suggesting an increase variance in the treated group) [3]. 
+                                                          h4("Fisher in a letter on this topic in 1938 to Henry Daniels said to look at the variance in the outcome (suggesting an increase variance in the treated group) [4]. 
                                         To quote from Senn, Fisher said ‘...although on the data it could not be said that the means were different...supposing
 the test were made between two varieties of the plant, the fact of a real difference
-in the variances shows that in some circumstances one variety is the better and in other circumstances that it is the worse’ [4]. 
+in the variances shows that in some circumstances one variety is the better and in other circumstances that it is the worse’ [5]. 
                                         Is there any evidence against the null hypothesis? H0: variance is equal in both arms H1: variance is not equal in both arms.
                                         The P-Value testing this hypothesis will for the vast majority of the time not reject the null hypothesis.  
                                         This is what we expect, given that the true magnitude of response in the simulation is constant for all 
@@ -286,7 +291,7 @@ in the variances shows that in some circumstances one variety is the better and 
                                      #h4("Figure 5 Observed individual changes plotted against baseline, treated (left) and control (right) arms incorporating a clinical relevant difference."),         
                                      
                                      p(strong(" ")),
-                                     p(strong("We replicate Stephen Senn's example [2], but using a simulated dataset (one realisation). We can calculate analytically using R
+                                     p(strong("We replicate Stephen Senn's example [3], but using a simulated dataset (one realisation). We can calculate analytically using R
                                               the proportion of treated who will fail to respond by pnorm((-2.5--2)/sqrt(1^2+1^2))= 0.36, see left plot using settings below.
                                               The blue dashed line defines the clinical relevant difference. The black dashed line the constant treatment effect applied 
                                               to EVERYONE in the treated group. Blue circles denote the observed responders.")),
