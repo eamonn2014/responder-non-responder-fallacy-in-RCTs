@@ -72,7 +72,7 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                      
                      
                      actionButton(inputId='ab1', label="Shiny",   icon = icon("th"), 
-                                  onclick ="window.open('https://raw.githubusercontent.com/eamonn2014/responder-non-responder-fallacy-in-RCTs/master/app.R', '_blank')"),   
+                                  onclick ="window.open('https://raw.githubusercontent.com/eamonn2014/responder-non-responder-fallacy-in-RCTs/c4dac903f502f30c91b44f9b3153b4c9e9dafd3e/app.R', '_blank')"),   
                      actionButton(inputId='ab1', label="R code",   icon = icon("th"), 
                                   onclick ="window.open('https://raw.githubusercontent.com/eamonn2014/responder-non-responder-fallacy-in-RCTs/master/Rcode.R', '_blank')"),   
                      actionButton("resample", "Simulate a new sample"),
@@ -148,17 +148,17 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                             div(p(" ")),
                             tags$a(href = "https://www.youtube.com/watch?v=uiCd9m6tmt0&feature=youtu.be", "[3] Professor George Davey Smith - Some constraints on the scope and potential of personalised medicine"),
                             div(p(" ")),
-                             tags$a(href = "https://physoc.onlinelibrary.wiley.com/doi/epdf/10.1113/EP085070", "[4] True and false interindividual differences in the physiological response to an intervention"),
+                              tags$a(href = "https://onlinelibrary.wiley.com/doi/epdf/10.1002/sim.2074", "[4] Senn quoting fisher"),
+                              div(p(" ")),
+                             tags$a(href = "https://physoc.onlinelibrary.wiley.com/doi/epdf/10.1113/EP085070", "[5] True and false interindividual differences in the physiological response to an intervention"),
                              div(p(" ")),
-                            tags$a(href = "https://twitter.com/f2harrell/status/1220700181496320001", "[5] Purpose of RCT"),
+                            tags$a(href = "https://twitter.com/f2harrell/status/1220700181496320001", "[6] Purpose of RCT"),
                              div(p(" ")),
-                          tags$a(href = "https://www.nature.com/magazine-assets/d41586-018-07535-2/d41586-018-07535-2.pdf", "[6] Statistical pitfalls of personalized medicine"),
+                          tags$a(href = "https://www.nature.com/magazine-assets/d41586-018-07535-2/d41586-018-07535-2.pdf", "[7] Statistical pitfalls of personalized medicine"),
                           div(p(" ")),
-                          tags$a(href = "http://shiny-eio.upc.edu/pubs/F1000_precision_medicine/", "[7] A similar app"),
+                          tags$a(href = "http://shiny-eio.upc.edu/pubs/F1000_precision_medicine/", "[8] A similar app"),
                           div(p(" ")),
-
-
-
+                      
                         )
                           
                    ),
@@ -240,7 +240,10 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                             ) ,
                             #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                              tabPanel("5 Analyse the variance!", value=6, 
-                                                          h4("Fisher in a letter on this topic in 1938 said to look at the variance in the outcome (suggesting an increase variance in the treated group) [3]. 
+                                                          h4("Fisher in a letter on this topic in 1938 to Henry Daniels said to look at the variance in the outcome (suggesting an increase variance in the treated group) [3]. 
+                                        To quote from Senn, Fisher said ‘...although on the data it could not be said that the means were different...supposing
+the test were made between two varieties of the plant, the fact of a real difference
+in the variances shows that in some circumstances one variety is the better and in other circumstances that it is the worse’ [4]. 
                                         Is there any evidence against the null hypothesis? H0: variance is equal in both arms H1: variance is not equal in both arms.
                                         The P-Value testing this hypothesis will for the vast majority of the time not reject the null hypothesis.  
                                         This is what we expect, given that the true magnitude of response in the simulation is constant for all 
