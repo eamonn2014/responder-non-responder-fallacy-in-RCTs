@@ -63,7 +63,7 @@ ui <- fluidPage(theme = shinytheme("journal"), #https://www.rdocumentation.org/p
                         this standard deviation is the between 
                         person variation.
                         The next slider imposes, if desired,
-                        an inclusion criteria based on the response distribution. All scenarios have 99% power with alpha 1% to pick up the treatment effect."),
+                        an inclusion criteria based on the response distribution. All scenarios have 99% power with two sided alpha 1% to pick up the treatment effect."),
                      
                      # actionButton(inputId='ab1', label="R code",   icon = icon("th"), 
                      #              onclick ="window.open('https://raw.githubusercontent.com/eamonn2014/responder-non-responder-fallacy-in-RCTs/master/app.R', '_blank')"),    
